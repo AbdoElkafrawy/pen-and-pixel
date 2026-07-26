@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>new post</title>
+</head>
+<body>
+    
+     <!-- Form for creating a new blog post.Submitting this sends a POST request to "/new",matching the app.post("/new", ...) route in server.js.
+     No "enctype" is needed here since this is plain text data,not file uploads. -->
+    <form action="/new" method="POST">
+
+        <!-- Text input for the post title The "name" attribute ("title") is what determines the key
+             used in req.body on the server — i.e. req.body.title -->
+        <input type="text" name="title" placeholder="Title">
+        
+        <!-- Multi-line input for the post body.Its "name" attribute ("content") becomes req.body.content on the server side -->
+        <textarea name="content" placeholder="Write your post here..."></textarea>
+
+        <!-- Submitting the form triggers the browser's default form submission, sending both fields above to the "/new" route -->
+        <button type="submit">publish</button>
+    </form>
+
+</body>
+</html>

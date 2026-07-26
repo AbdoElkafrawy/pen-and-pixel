@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Link to the external stylesheet served from the "public/css" folder
+         (works because app.use(express.static("public")) exposes it at /css/style.css) -->
+    <link rel="stylesheet" href="/css/style.css">
+    <title>My Blog</title>
+</head>
+<body>
+
+    <header>
+        <h1>My Blog</h1>
+
+     <a href="/new" class="new-post-btn">
+        + New Post
+     </a>
+    </header>
+
+    <main>
+        <section class="hero">
+
+    <h2>Share your thoughts with the world.</h2>
+
+    <p>
+        Create, edit and manage your blog posts.
+    </p>
+
+</section>
+
+<section class="posts">
+
+    <!-- EJS scriptlet tag <% %>: runs raw JavaScript, outputs nothing itself.Here it starts a loop over the "posts" array passed in from
+res.render("home", { posts }) in the server code. -->
+    <% posts.forEach((post) => { %>
+
+    <!-- EJS output tag <%= %>: evaluates the expression and injects the
+             result into the HTML, automatically escaping it to prevent
+             HTML/script injection from user-submitted content -->
+    <article>
+
+    
+             <h2> <%= post.title %> </h2>
+                <p> <%= post.content %> </p>
+
+    <!-- Delete form for this specific post.
+             The post's id is embedded directly into the action URL,
+             so submitting this form sends a POST request to
+             "/posts/<id>/delete" — matching the delete route in server.js -->
+    
+
+<div class="post-actions">
+
+    
+        <a class= "edit-btn" 
+        href="/posts/<%= post.id %>/edit">Edit
+        </a>
+
+        <form 
+        action="/posts/<%= post.id %>/delete" 
+        method="POST">
+
+    <button 
+        class="delete-btn" 
+        onclick="return confirm('Delete this post?')" 
+        type="submit">
+        Delete
+    </button> 
+
+    </form>
+    </div>  
+    
+    <!-- Closing scriptlet tag: ends the forEach loop.
+         Everything between the two scriptlet tags above repeats once per post. -->
+
+         </article>
+
+<% }); %>
+
+
+
+</section>
+
+    </main>
+
+
+
+
+
+
+
+<footer>
+
+</footer>
+
+</body>
+</html>
+
