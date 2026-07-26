@@ -3,26 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/css/style.css">
+
     <title>🖋️ Pen & Pixel</title>
 </head>
 <body>
-    
-     
-    <form action="/posts/<%= post.id %>/edit" method="POST">
+    <main class="form-container"> 
+    <!-- Form for editing an existing blog post.Submitting this sends a POST request to "/posts/<id>/edit", matching the edit route in index.js.-->
+     <form 
+      action="/posts/<%= post.id %>/edit"
+      method="POST"
+      class="post-form">
 
+        <!-- Text input for the post title The "name" attribute ("title") is what determines the key
+             used in req.body on the server — i.e. req.body.title -->
+            <label for="title">Title</label>
+
+             <input
+                id="title"
+                type="text"
+                name="title"
+                value="<%= post.title %>"
+                minlength="5"
+                maxlength="100"
+                placeholder="Enter a title..."
+                required
+             >
+             <p id="title-counter"  class="counter" >0 / 100</p>
         
-        <input 
-        type="text" 
-        name="title" 
-        value="<%= post.title%>" 
-        placeholder="Title">
-        
+        <!-- Multi-line input for the post body.Its "name" attribute ("content") becomes req.body.content on the server side -->
+        <label for="content">Content</label>
+
         <textarea 
+        id="content"
         name="content" 
-        placeholder="edit your post here..."> <%= post.content %> </textarea>
+        placeholder="Write your post here..."
+        required
+        minlength="20"
+        maxlength="5000"
+        ><%= post.content %></textarea>
 
+        <p id="content-counter" class="counter">0 / 5000</p>
+
+        <!-- Submitting the form triggers the browser's default form submission, sending both fields above to the "/new" route -->
         <button type="submit">Save Changes</button>
-    </form>
+     </form>
+
+
+    </main>
+         
+    <script src="/js/script.js"></script>
 
 </body>
 </html>

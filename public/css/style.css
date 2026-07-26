@@ -244,6 +244,27 @@ article:hover{
 
 }
 
+.counter {
+    margin-top: 8px;
+    text-align: right;
+    font-size: 0.9rem;
+    color: #6b7280;
+    transition: color 0.2s ease;
+}
+
+.counter.warning {
+    color: #f59e0b;
+}
+
+.counter.danger {
+    color: #ef4444;
+}
+
+
+
+
+
+
 
 
 

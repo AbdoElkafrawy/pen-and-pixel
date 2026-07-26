@@ -3,24 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/css/style.css">
+
     <title>🖋️ Pen & Pixel</title>
 </head>
 <body>
-    
+    <main class="form-container"> 
      <!-- Form for creating a new blog post.Submitting this sends a POST request to "/new",matching the app.post("/new", ...) route in server.js.
      No "enctype" is needed here since this is plain text data,not file uploads. -->
-    <form action="/new" method="POST">
+     <form action="/new" method="POST" class="post-form" >
 
         <!-- Text input for the post title The "name" attribute ("title") is what determines the key
              used in req.body on the server — i.e. req.body.title -->
-        <input type="text" name="title" placeholder="Title">
+            <label for="title">Title</label>
+
+             <input
+                id="title"
+                type="text"
+                name="title"
+                minlength="5"
+                maxlength="100"
+                placeholder="Enter a title..."
+                required
+             >
+             <p id="title-counter"  class="counter" >0 / 100</p>
         
         <!-- Multi-line input for the post body.Its "name" attribute ("content") becomes req.body.content on the server side -->
-        <textarea name="content" placeholder="Write your post here..."></textarea>
+        <label for="content">Content</label>
+
+        <textarea 
+        id="content"
+        name="content" 
+        placeholder="Write your post here..."
+        required
+        minlength="20"
+        maxlength="5000"
+        ></textarea>
+
+        <p id="content-counter" class="counter">0 / 5000</p>
 
         <!-- Submitting the form triggers the browser's default form submission, sending both fields above to the "/new" route -->
         <button type="submit">publish</button>
-    </form>
+     </form>
+
+
+    </main>
+         
+    <script src="/js/script.js"></script>
 
 </body>
 </html>
