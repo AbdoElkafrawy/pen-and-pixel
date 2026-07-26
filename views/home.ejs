@@ -3,15 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Link to the external stylesheet served from the "public/css" folder
          (works because app.use(express.static("public")) exposes it at /css/style.css) -->
     <link rel="stylesheet" href="/css/style.css">
-    <title>My Blog</title>
+
+    <title>🖋️ Pen & Pixel</title>
+
 </head>
 <body>
 
     <header>
-        <h1>My Blog</h1>
+        <h1> Pen & Pixel</h1>
 
      <a href="/new" class="new-post-btn">
         + New Post
@@ -21,15 +28,33 @@
     <main>
         <section class="hero">
 
-    <h2>Share your thoughts with the world.</h2>
+    <h2>Every great creation begins with a single thought.</h2>
 
     <p>
-        Create, edit and manage your blog posts.
+        Write yours.
     </p>
+
+    <a href="/new" class="hero-btn">
+    Start Writing
+    </a>
+
+
 
 </section>
 
 <section class="posts">
+
+    <h2 class="posts-heading">
+    Latest Posts
+</h2>
+    
+    <% if (posts.length === 0) { %>
+
+    <p class="empty-message">
+        No posts yet. Be the first to write one!
+    </p>
+
+<% } %>
 
     <!-- EJS scriptlet tag <% %>: runs raw JavaScript, outputs nothing itself.Here it starts a loop over the "posts" array passed in from
 res.render("home", { posts }) in the server code. -->
@@ -70,7 +95,7 @@ res.render("home", { posts }) in the server code. -->
 
     </form>
     </div>  
-    
+
     <!-- Closing scriptlet tag: ends the forEach loop.
          Everything between the two scriptlet tags above repeats once per post. -->
 

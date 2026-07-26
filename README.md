@@ -1,7 +1,6 @@
-# Blog Project
+#🖋️ Pen & Pixel
 
-A responsive blog application built with Node.js, Express.js and EJS.
-
+A modern blogging platform built with Node.js, Express.js, and EJS that allows users to create, edit, and manage their thoughts in a clean and responsive interface.
 ## Features
 
 - Create blog posts

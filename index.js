@@ -29,7 +29,9 @@ app.set('view engine','ejs');
 /* GET "/" — homepage route.Renders the "home" view and passes the current posts array to it,
 so the template can loop through and display each post.*/
 app.get("/", (req,res)=>{
-    res.render("home" , {posts});
+
+    const displayPosts=posts.slice().reverse();
+    res.render("home" , {posts:displayPosts});
 });
 
 // GET "/new" — shows the form for creating a new post.Just renders the "new" view; no data processing needed here.
