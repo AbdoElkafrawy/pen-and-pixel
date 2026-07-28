@@ -8,47 +8,51 @@
     <title>🖋️ Pen & Pixel</title>
 </head>
 <body>
-    <main class="form-container"> 
-     <!-- Form for creating a new blog post.Submitting this sends a POST request to "/new",matching the app.post("/new", ...) route in server.js.
-     No "enctype" is needed here since this is plain text data,not file uploads. -->
-     <form action="/new" method="POST" class="post-form" >
 
-        <!-- Text input for the post title The "name" attribute ("title") is what determines the key
-             used in req.body on the server — i.e. req.body.title -->
-            <label for="title">Title</label>
+    <!-- 👇 HEADER and a button to return to home page 👇 -->
+    <header>
+        <h1>🖋️ Pen & Pixel</h1>
+        <a href="/" class="new-post-btn">← Back to Home</a>
+    </header>
 
-             <input
-                id="title"
-                type="text"
-                name="title"
-                minlength="5"
-                maxlength="100"
-                placeholder="Enter a title..."
-                required
-             >
-             <p id="title-counter"  class="counter" >0 / 100</p>
+        <main class="form-container"> 
+        <h2 class="form-heading">✍️ Create New Post</h2>
         
-        <!-- Multi-line input for the post body.Its "name" attribute ("content") becomes req.body.content on the server side -->
-        <label for="content">Content</label>
+        <form action="/new" method="POST" class="post-form">
 
-        <textarea 
-        id="content"
-        name="content" 
-        placeholder="Write your post here..."
-        required
-        minlength="20"
-        maxlength="5000"
-        ></textarea>
+            <div class="form-group">
+                <label for="title">Title <span class="required">*</span></label>
+                <input
+                    id="title"
+                    type="text"
+                    name="title"
+                    minlength="5"
+                    maxlength="100"
+                    placeholder="Enter a title..."
+                    required
+                >
+                <p id="title-counter" class="counter">0 / 100</p>
+            </div>
+        
+            <div class="form-group">
+                <label for="content">Content <span class="required">*</span></label>
+                <textarea 
+                    id="content"
+                    name="content" 
+                    placeholder="Write your post here..."
+                    required
+                    minlength="20"
+                    maxlength="5000"
+                ></textarea>
+                <p id="content-counter" class="counter">0 / 5000</p>
+            </div>
 
-        <p id="content-counter" class="counter">0 / 5000</p>
-
-        <!-- Submitting the form triggers the browser's default form submission, sending both fields above to the "/new" route -->
-        <button type="submit">publish</button>
-     </form>
-
-
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">Publish</button>
+                <a href="/" class="cancel-btn">Cancel</a>
+            </div>
+        </form>
     </main>
-         
     <script src="/js/script.js"></script>
 
 </body>

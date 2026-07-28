@@ -60,47 +60,35 @@
 res.render("home", { posts }) in the server code. -->
     <% posts.forEach((post) => { %>
 
-    <!-- EJS output tag <%= %>: evaluates the expression and injects the
-             result into the HTML, automatically escaping it to prevent
-             HTML/script injection from user-submitted content -->
-    <article>
-
+    <article class="post-card">
+    <div class="post-header">
+        <h2><%= post.title %></h2>
+        <p class="post-meta">📅 <%= post.createdAt %></p>
+    </div>
     
-             <h2> <%= post.title %> </h2>
-                <p> <%= post.content %> </p>
+    <div class="post-body">
+        <p>
+            <% if (post.content.length > 200) { %>
+                <%= post.content.substring(0, 200) %>...
+            <% } else { %>
+                <%= post.content %>
+            <% } %>
+        </p>
+    </div>
 
-    <!-- Delete form for this specific post.
-             The post's id is embedded directly into the action URL,
-             so submitting this form sends a POST request to
-             "/posts/<id>/delete" — matching the delete route in server.js -->
-    
-
-<div class="post-actions">
-
-    
-        <a class= "edit-btn" 
-        href="/posts/<%= post.id %>/edit">Edit
-        </a>
-
-        <form 
-        action="/posts/<%= post.id %>/delete" 
-        method="POST">
-
-    <button 
-        class="delete-btn" 
-        onclick="return confirm('Delete this post?')" 
-        type="submit">
-        Delete
-    </button> 
-
-    </form>
-    </div>  
-
-    <!-- Closing scriptlet tag: ends the forEach loop.
-         Everything between the two scriptlet tags above repeats once per post. -->
-
-         </article>
-
+    <div class="post-footer">
+        <a href="/posts/<%= post.id %>" class="read-more">Read More →</a>
+        
+        <div class="post-actions">
+            <a class="edit-btn" href="/posts/<%= post.id %>/edit">Edit</a>
+            <form action="/posts/<%= post.id %>/delete" method="POST">
+                <button class="delete-btn" onclick="return confirm('Delete this post?')" type="submit">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</article>
 <% }); %>
 
 

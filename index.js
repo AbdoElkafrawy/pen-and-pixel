@@ -16,6 +16,9 @@ const port= 3000 ;
 // Starts at 1 and increments every time a post is created.
 let nextId = 1;
 
+// 👇 Creates a new Date object with the current date and time 👇
+const now = new Date();
+
 // Serve static files (CSS, client-side JS, images) from the "public" folder
 app.use(express.static("public"));
 
@@ -44,10 +47,22 @@ app.get("/new",(req,res)=>{
 app.post("/new", (req, res) => {
 
     const { title, content } = req.body; // Destructure the submitted form fields out of req.body
+    
+    // 👇 CREATE A TIMESTAMP RIGHT HERE 👇
+    const now = new Date();
+    const timestamp = now.toLocaleString('en-US', { //formats the date in a readable way
+        year: 'numeric',  //shows full year (2026)
+        month: 'long',  //shows full month name (July)
+        day: 'numeric', //shows day number (28)
+        hour: '2-digit', // shows hour (03)
+        minute: '2-digit' // shows minutes (45)
+    });                     // Result: "July 28, 2026, 03:45 PM"
+    
     posts.push({                         // Add a new post object to the posts array,
-        id:nextId,                      // using the current nextId as its unique identifier
+        id: nextId,                      // using the current nextId as its unique identifier
         title,
-        content
+        content,
+        createdAt: timestamp             // 👈 Saves the formatted timestamp with the post
     });
     console.log(posts); // Debug log — see current state of all posts in the console
     nextId++;           // Increment so the next post gets a different id
@@ -89,6 +104,22 @@ app.post("/posts/:id/edit", (req, res) => {
     res.redirect("/");
 
 });
+
+app.get("/posts/:id", (req, res) => {
+
+    const id = Number(req.params.id);
+    const post = posts.find(post => post.id === id);
+    
+    if (!post) {
+        return res.status(404).send("Post not found");
+    }
+
+    res.render("post", { post });
+
+});
+
+
+
 
 // Start the server and listen for incoming requests on the specified port
 app.listen(port,()=>{

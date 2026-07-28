@@ -6,13 +6,35 @@
         <link rel="stylesheet" href="/css/style.css">
 
     <title>🖋️ Pen & Pixel</title>
+     
+
 </head>
 <body>
+
+    <header>
+        <h1>🖋️ Pen & Pixel</h1>
+        <a href="/" class="new-post-btn">← Back to Home</a>
+    </header>
+
     <main class="form-container"> 
      
         <h1><%= post.title %></h1>
+
+        <p class="post-meta single">📅 <%= post.createdAt %></p> // Adds the timestamp
+
         <p><%= post.content %></p>
+
+        <!-- 👇 edit & delete post action buttons 👇 -->
+    <div class="post-actions">
+        <a class="edit-btn" href="/posts/<%= post.id %>/edit">Edit</a>
         
+        <form action="/posts/<%= post.id %>/delete" method="POST">
+            <button class="delete-btn" onclick="return confirm('Delete this post?')" type="submit">
+                Delete
+            </button>
+        </form>
+    </div>
+
     </main>
          
     <script src="/js/script.js"></script>
