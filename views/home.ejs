@@ -34,6 +34,22 @@
         Write yours.
     </p>
 
+<!--showing the weather card-->
+
+   <div class="weather-card">
+    <h3>📍 <%= weather.city %></h3>
+
+    <div class="weather-temp">
+        <%= Math.round(weather.temperature) %>°C
+    </div>
+
+    <p class="weather-desc"><%= weather.description %></p>
+
+    <p class="weather-feels">
+        Feels like <strong><%= Math.round(weather.feelsLike) %>°C</strong>
+    </p>
+</div>
+
     <a href="/new" class="hero-btn">
     Start Writing
     </a>
@@ -63,7 +79,9 @@ res.render("home", { posts }) in the server code. -->
     <article class="post-card">
     <div class="post-header">
         <h2><%= post.title %></h2>
-        <p class="post-meta">📅 <%= post.createdAt %></p>
+       <p class="post-meta">
+        📅 <%= post.createdAt %> • ⏱️ <%= post.readingTime %> min read
+        </p>
     </div>
     
     <div class="post-body">

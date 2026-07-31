@@ -7,12 +7,31 @@ import ejs from 'ejs';
 // Import Mongoose — the MongoDB library for Node.js
 import mongoose from 'mongoose';
 
+//import axios to connect Weather API to our home page
+import axios from 'axios';
+
+// import the helper function from our local path
+import calculateReadingTime from "./helpers/readingTime.js";
+
+// our schema to identify the weather_code: which is part of the response data the API has sent
+
+const weatherCodes = {
+    0: "☀️ Clear Sky",
+    1: "🌤️ Mainly Clear",
+    2: "⛅ Partly Cloudy",
+    3: "☁️ Overcast",
+    45: "🌫️ Fog",
+    61: "🌧️ Rain",
+    80: "🌦️ Rain Showers",
+    95: "⛈️ Thunderstorm"
+};
+
 // ============================================
 // 1. CONNECT TO MONGODB
 // ============================================
 
-// Connect to MongoDB (local database named "blog")
-await mongoose.connect('mongodb://127.0.0.1:27017/blog');
+// Connect to MongoDB
+await mongoose.connect("mongodb://127.0.0.1:27017/blog");
 
 // Define the Post schema (structure of a post)
 const postSchema = new mongoose.Schema({
@@ -53,10 +72,45 @@ app.get("/", async (req, res) => {
     try {
         // Find all posts in the database, sorted by createdAt (newest first)
         const posts = await Post.find().sort({ createdAt: -1 });
-        res.render("home", { posts });
+
+        const postsWithReadingTime = posts.map(post => ({
+    ...post.toObject(),
+    id: post._id.toString(),
+    readingTime: calculateReadingTime(post.content)
+}));
+
+        console.log(postsWithReadingTime[0]);
+
+        // Get the visitor's location from their IP address
+        const locationResponse = await axios.get("https://ipapi.co/json/");
+
+        const location = locationResponse.data;
+        console.log(location);
+
+        // Fetch current weather
+        const weatherResponse = await axios.get(
+    `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current=temperature_2m,apparent_temperature,weather_code&timezone=auto`
+);
+        
+        // Store only the weather data
+        const weatherData = weatherResponse.data;
+
+        const weather = {
+                city: location.city,
+                temperature: Math.round(weatherData.current.temperature_2m),
+                feelsLike: Math.round(weatherData.current.apparent_temperature),
+                description: weatherCodes[weatherData.current.weather_code] || "Unknown",
+                updatedAt: weatherData.current.time
+                };
+        console.log(weather);
+        // Render homepage with both posts and weather
+        res.render("home", { 
+            posts: postsWithReadingTime,
+            weather
+         });
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error fetching posts");
+        res.status(500).send("Error loading homepage");
     }
 });
 

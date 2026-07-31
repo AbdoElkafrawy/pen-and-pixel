@@ -584,6 +584,56 @@ article:hover{
     transform: translateY(-2px);
 }
 
+/* Weather Card */
+.weather-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 25px auto;
+    max-width: 320px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.weather-card h3 {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.weather-card p {
+    margin: 8px 0;
+    font-size: 0.95rem;
+}
+
+.weather-card strong {
+    color: #ffd166;
+}
+
+.weather-temp {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 10px 0;
+}
+
+.weather-desc {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.weather-feels {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+
+
+
+
+
+
+
 
 
 
