@@ -139,8 +139,7 @@ app.set("view engine", "ejs");
 
 
 
-let cachedWeather = null;
-let weatherLastUpdated = 0;
+const weatherCache = new Map();
 const WEATHER_CACHE_DURATION = 60 * 60 * 1000;
 // =======================================================
 //                        ROUTES
@@ -204,55 +203,60 @@ app.get("/", async (req, res) => {
 
         // Optional homepage widgets.
         // If an external API fails, the page should still load.
-        let weather = cachedWeather ;
+        const clientIp = (
+            (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "127.0.0.1")
+                .split(",")[0]
+                .trim()
+        );
+
+        let weather = null;
         let quote = null;
 
+        const cached = weatherCache.get(clientIp);
+        const cacheIsValid = cached && Date.now() - cached.updatedAt < WEATHER_CACHE_DURATION;
 
-        // -----------------------------------------------
-        // Weather Widget
-        // -----------------------------------------------
+        if (cacheIsValid) {
+            weather = cached.weather;
+        } else {
+            try {
+                const defaultLocationUrl = "https://ipwho.is/";
+                let locationUrl =
+                    clientIp === "127.0.0.1" || clientIp === "::1"
+                        ? defaultLocationUrl
+                        : `https://ipwho.is/${clientIp}`;
 
-        const cacheIsValid =
-                    cachedWeather &&
-                    Date.now() - weatherLastUpdated < WEATHER_CACHE_DURATION;
+                let locationResponse = await axios.get(locationUrl);
+                let location = locationResponse.data;
 
-            if (!cacheIsValid) {
+                if (!location.success) {
+                    locationResponse = await axios.get(defaultLocationUrl);
+                    location = locationResponse.data;
+                }
 
-        try {
+                const weatherResponse = await axios.get(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current=temperature_2m,apparent_temperature,weather_code&timezone=auto`
+                );
 
-            const locationResponse = await axios.get(
-                "https://ipapi.co/json/"
-            );
+                const weatherData = weatherResponse.data;
 
-            const location = locationResponse.data;
+                weather = {
+                    city: location.city || `${location.region}, ${location.country}`,
+                    temperature: Math.round(weatherData.current.temperature_2m),
+                    feelsLike: Math.round(weatherData.current.apparent_temperature),
+                    description:
+                        weatherCodes[weatherData.current.weather_code] ?? "Unknown",
+                    updatedAt: weatherData.current.time
+                };
 
-            const weatherResponse = await axios.get(
-                `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current=temperature_2m,apparent_temperature,weather_code&timezone=auto`
-            );
-
-            const weatherData = weatherResponse.data;
-
-            weather = {
-                city: location.city,
-                temperature: Math.round(weatherData.current.temperature_2m),
-                feelsLike: Math.round(weatherData.current.apparent_temperature),
-                description:
-                    weatherCodes[weatherData.current.weather_code] ?? "Unknown",
-                updatedAt: weatherData.current.time
-            };
-
-
-            cachedWeather = weather;
-            weatherLastUpdated = Date.now();
-
-        } catch (error) {
-
-            console.error("Weather API Error:", error.message);
-            console.error("Failed URL:", error.config?.url);
-
+                weatherCache.set(clientIp, {
+                    weather,
+                    updatedAt: Date.now()
+                });
+            } catch (error) {
+                console.error("Weather API Error:", error.message);
+                console.error("Failed URL:", error.config?.url);
+            }
         }
-
-    }
         // -----------------------------------------------
         // Quote of the Day
         // -----------------------------------------------
