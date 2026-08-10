@@ -20,7 +20,11 @@
      
         <h1><%= post.title %></h1>
 
-        <p class="post-meta single">📅 <%= post.createdAt %></p> // Adds the timestamp
+        <% if (post.image) { %>
+            <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
+        <% } %>
+
+        <p class="post-meta single">📅 <%= post.createdAtDisplay || post.createdAt %></p>
 
         <p><%= post.content %></p>
 

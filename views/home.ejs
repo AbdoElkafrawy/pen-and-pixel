@@ -132,12 +132,16 @@ res.render("home", { posts }) in the server code. -->
 
     <article class="post-card">
     <div class="post-header">
-        <h2><%= post.title %></h2>
+        <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
        <p class="post-meta">
-        📅 <%= post.createdAt %> • ⏱️ <%= post.readingTime %> min read
+        📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
         </p>
     </div>
+             <% if (post.image) { %>
+    <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
+        <% } %>
     
+
     <div class="post-body">
         <p>
             <% if (post.content.length > 200) { %>

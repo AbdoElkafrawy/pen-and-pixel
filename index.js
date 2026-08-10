@@ -4,6 +4,8 @@
 
 // Express framework for routing and handling HTTP requests
 import express from "express";
+import path from "path";
+import fs from "fs";
 
 // Template engine used to render dynamic HTML pages
 import ejs from "ejs";
@@ -23,9 +25,30 @@ import calculateReadingTime from "./helpers/readingTime.js";
 // Middleware for handling file uploads
 import multer from "multer";
 
-//basic Multer upload handler
+const uploadDir = path.join("public", "images");
+fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+    destination: uploadDir,
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname).toLowerCase();
+        const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+        cb(null, filename);
+    }
+});
+
 const upload = multer({
-    dest: "public/images/"
+    storage,
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith("image/")) {
+            cb(null, true);
+        } else {
+            cb(new Error("Only image files are allowed"), false);
+        }
+    },
+    limits: {
+        fileSize: 5 * 1024 * 1024
+    }
 });
 
 
@@ -55,7 +78,6 @@ const weatherCodes = {
 // Establish a connection with MongoDB before the server starts.
 await mongoose.connect("mongodb://127.0.0.1:27017/blog");
 
-
 // =======================================================
 //                    MONGOOSE MODELS
 // =======================================================
@@ -72,14 +94,31 @@ const postSchema = new mongoose.Schema({
         required: true
     },
 
-    createdAt: {
+    image: {
         type: String,
+        required: false
+    },
+
+    createdAt: {
+        type: Date,
         required: true
     }
 });
 
 // Creates the model we'll use throughout the application.
 const Post = mongoose.model("Post", postSchema);
+
+function deleteImageFile(imageUrl) {
+    if (!imageUrl) return;
+
+    const imagePath = path.join("public", imageUrl.replace(/^\/+/, ""));
+
+    fs.unlink(imagePath, (err) => {
+        if (err && err.code !== "ENOENT") {
+            console.error("Image delete error:", err);
+        }
+    });
+}
 
 
 // =======================================================
@@ -145,11 +184,23 @@ app.get("/", async (req, res) => {
             posts = await Post.find().sort({ createdAt: -1 });
         }
 
-         const postsWithReadingTime = posts.map(post => ({
-            ...post.toObject(),
-            id: post._id.toString(),
-            readingTime: calculateReadingTime(post.content)
-        }));
+         const postsWithReadingTime = posts.map(post => {
+            const createdAtDate = post.createdAt instanceof Date ? post.createdAt : new Date(post.createdAt);
+
+            return {
+                ...post.toObject(),
+                id: post._id.toString(),
+                readingTime: calculateReadingTime(post.content),
+                createdAt: createdAtDate,
+                createdAtDisplay: createdAtDate.toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                })
+            };
+        });
 
         // Optional homepage widgets.
         // If an external API fails, the page should still load.
@@ -263,25 +314,20 @@ app.get("/new", (req, res) => {
 
 
 // Save the new post
-app.post("/new", upload.single("image") ,async (req, res) => {
+app.post("/new", upload.single("image"), async (req, res) => {
     console.log(req.file);
     try {
 
         const { title, content } = req.body;
+        const image = req.file ? `/images/${req.file.filename}` : undefined;
 
-        const timestamp = new Date().toLocaleString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        });
+        const createdAt = new Date();
 
         const newPost = new Post({
             title,
             content,
-            image: `/images/${req.file.filename}`,
-            createdAt: timestamp
+            ...(image && { image }),
+            createdAt
         });
 
         await newPost.save();
@@ -352,24 +398,34 @@ app.get("/posts/:id/edit", async (req, res) => {
 
 
 // Save edited post
-app.post("/posts/:id/edit", async (req, res) => {
+app.post("/posts/:id/edit", upload.single("image"), async (req, res) => {
 
     try {
 
         const { title, content } = req.body;
+        const existingPost = await Post.findById(req.params.id);
+
+        if (!existingPost) {
+            return res.status(404).send("Post not found");
+        }
+
+        const updateData = { title, content };
+
+        if (req.file) {
+            if (existingPost.image) {
+                deleteImageFile(existingPost.image);
+            }
+            updateData.image = `/images/${req.file.filename}`;
+        }
 
         const updatedPost = await Post.findByIdAndUpdate(
             req.params.id,
-            { title, content },
+            updateData,
             {
                 new: true,
                 runValidators: true
             }
         );
-
-        if (!updatedPost) {
-            return res.status(404).send("Post not found");
-        }
 
         res.redirect("/");
 
@@ -395,6 +451,10 @@ app.post("/posts/:id/delete", async (req, res) => {
 
         if (!deletedPost) {
             return res.status(404).send("Post not found");
+        }
+
+        if (deletedPost.image) {
+            deleteImageFile(deletedPost.image);
         }
 
         res.redirect("/");
