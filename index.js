@@ -20,6 +20,14 @@ import "dotenv/config";
 // Local helper function used to calculate a post's reading time
 import calculateReadingTime from "./helpers/readingTime.js";
 
+// Middleware for handling file uploads
+import multer from "multer";
+
+//basic Multer upload handler
+const upload = multer({
+    dest: "public/images/"
+});
+
 
 // =======================================================
 //                  APPLICATION CONFIGURATION
@@ -91,6 +99,10 @@ app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 
+
+let cachedWeather = null;
+let weatherLastUpdated = 0;
+const WEATHER_CACHE_DURATION = 60 * 60 * 1000;
 // =======================================================
 //                        ROUTES
 // =======================================================
@@ -101,6 +113,7 @@ app.set("view engine", "ejs");
 ====================================================== */
 
 app.get("/", async (req, res) => {
+    
     try {
 
         // -----------------------------------------------
@@ -140,13 +153,19 @@ app.get("/", async (req, res) => {
 
         // Optional homepage widgets.
         // If an external API fails, the page should still load.
-        let weather = null;
+        let weather = cachedWeather ;
         let quote = null;
 
 
         // -----------------------------------------------
         // Weather Widget
         // -----------------------------------------------
+
+        const cacheIsValid =
+                    cachedWeather &&
+                    Date.now() - weatherLastUpdated < WEATHER_CACHE_DURATION;
+
+            if (!cacheIsValid) {
 
         try {
 
@@ -171,13 +190,18 @@ app.get("/", async (req, res) => {
                 updatedAt: weatherData.current.time
             };
 
+
+            cachedWeather = weather;
+            weatherLastUpdated = Date.now();
+
         } catch (error) {
 
             console.error("Weather API Error:", error.message);
+            console.error("Failed URL:", error.config?.url);
 
         }
 
-
+    }
         // -----------------------------------------------
         // Quote of the Day
         // -----------------------------------------------
@@ -239,8 +263,8 @@ app.get("/new", (req, res) => {
 
 
 // Save the new post
-app.post("/new", async (req, res) => {
-
+app.post("/new", upload.single("image") ,async (req, res) => {
+    console.log(req.file);
     try {
 
         const { title, content } = req.body;
@@ -256,6 +280,7 @@ app.post("/new", async (req, res) => {
         const newPost = new Post({
             title,
             content,
+            image: `/images/${req.file.filename}`,
             createdAt: timestamp
         });
 
