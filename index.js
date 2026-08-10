@@ -106,15 +106,37 @@ app.get("/", async (req, res) => {
         // -----------------------------------------------
         // Fetch blog posts
         // -----------------------------------------------
+        const search=req.query.search;
 
-        const posts = await Post.find().sort({ createdAt: -1 });
+        let posts;
 
-        const postsWithReadingTime = posts.map(post => ({
+        if(search){
+             posts = await Post.find({
+    $or: [
+        {
+            title: {
+                $regex: search,
+                $options: "i"
+            }
+        },
+        {
+            content: {
+                $regex: search,
+                $options: "i"
+            }
+        }
+    ]
+}).sort({ createdAt: -1 });
+        } else{
+            console.log("showing all posts");
+            posts = await Post.find().sort({ createdAt: -1 });
+        }
+
+         const postsWithReadingTime = posts.map(post => ({
             ...post.toObject(),
             id: post._id.toString(),
             readingTime: calculateReadingTime(post.content)
         }));
-
 
         // Optional homepage widgets.
         // If an external API fails, the page should still load.
@@ -191,7 +213,8 @@ app.get("/", async (req, res) => {
         res.render("home", {
             posts: postsWithReadingTime,
             weather,
-            quote
+            quote,
+            search
         });
 
     } catch (error) {

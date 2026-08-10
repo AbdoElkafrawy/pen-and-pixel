@@ -19,10 +19,26 @@
 
     <header>
         <h1> Pen & Pixel</h1>
+        
+         <div class="header-actions">
 
-     <a href="/new" class="new-post-btn">
-        + New Post
-     </a>
+     <form action ="/" method="GET" class="search-form">
+       <input type="search" 
+               name="search" 
+               placeholder="search posts..."
+               value="<%= search || '' %>"
+               > 
+
+     </form> 
+
+     <% if (search) { %>
+    <a href="/" class="clear-search-btn">Clear Search</a>
+<% } %>
+
+        <a href="/new" class="new-post-btn">
+             + New Post
+        </a>
+</div>
     </header>
 
     <main>
@@ -34,7 +50,7 @@
         Write yours.
     </p>
 
-
+<% if (weather) { %>
 <!--showing the weather card-->
 
    <div class="weather-card">
@@ -50,7 +66,13 @@
         Feels like <strong><%= Math.round(weather.feelsLike) %>°C</strong>
     </p>
 </div>
+<% } else { %>
 
+    <div class="weather-card">
+        <p>Weather is currently unavailable.</p>
+    </div>
+
+<% } %>
     <a href="/new" class="hero-btn">
     Start Writing
     </a>
@@ -73,15 +95,34 @@
 
 <section class="posts">
 
+    <% if (search) { %>
+
     <h2 class="posts-heading">
-    Latest Posts
-</h2>
+    Search Results for "<%= search %>" — <%= posts.length %> posts
+    </h2>
+    <% } else { %>
+
+    <h2 class="posts-heading">
+        Latest Posts
+    </h2>
+
+<% } %>
     
     <% if (posts.length === 0) { %>
 
-    <p class="empty-message">
-        No posts yet. Be the first to write one!
-    </p>
+    <% if (search) { %>
+
+        <p class="empty-message">
+            No posts found for "<%= search %>".
+        </p>
+
+    <% } else { %>
+
+        <p class="empty-message">
+            No posts yet. Be the first to write one!
+        </p>
+
+    <% } %>
 
 <% } %>
 
