@@ -16,8 +16,10 @@ import axios from "axios";
 // Dotenv for loading secrets and environment variables from .env
 import "dotenv/config";
 
-// File upload middleware (images)
+// File upload middleware (images) & Cloudinary storage engine
 import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 // Session middleware for managing user authentication state
 import session from "express-session";
@@ -117,17 +119,35 @@ const Post = mongoose.model("Post", postSchema);
 //             4. FILE UPLOAD SETUP (Multer)
 // =======================================================
 
-const uploadDir = path.join("public", "images");
-fs.mkdirSync(uploadDir, { recursive: true });
+let storage;
 
-const storage = multer.diskStorage({
-    destination: uploadDir,
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname).toLowerCase();
-        const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-        cb(null, filename);
-    }
-});
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+
+    storage = new CloudinaryStorage({
+        cloudinary,
+        params: {
+            folder: "pen-and-pixel-uploads",
+            allowed_formats: ["jpg", "jpeg", "png", "gif", "webp", "avif"]
+        }
+    });
+} else {
+    const uploadDir = path.join("public", "images");
+    fs.mkdirSync(uploadDir, { recursive: true });
+
+    storage = multer.diskStorage({
+        destination: uploadDir,
+        filename: (req, file, cb) => {
+            const ext = path.extname(file.originalname).toLowerCase();
+            const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+            cb(null, filename);
+        }
+    });
+}
 
 const upload = multer({
     storage,
@@ -143,17 +163,28 @@ const upload = multer({
     }
 });
 
-// Helper: safely deletes an associated image file from disk when a post is edited or deleted
+// Helper: safely deletes an associated image file (from Cloudinary or local disk)
 function deleteImageFile(imageUrl) {
     if (!imageUrl) return;
 
-    const imagePath = path.join("public", imageUrl.replace(/^\/+/, ""));
-
-    fs.unlink(imagePath, (err) => {
-        if (err && err.code !== "ENOENT") {
-            console.error("Image cleanup error:", err.message);
+    if (imageUrl.includes("cloudinary.com")) {
+        try {
+            const parts = imageUrl.split("/");
+            const filenameWithExt = parts.pop();
+            const folder = parts.pop();
+            const publicId = `${folder}/${filenameWithExt.substring(0, filenameWithExt.lastIndexOf("."))}`;
+            cloudinary.uploader.destroy(publicId);
+        } catch (err) {
+            console.error("Cloudinary image delete error:", err.message);
         }
-    });
+    } else {
+        const imagePath = path.join("public", imageUrl.replace(/^\/+/, ""));
+        fs.unlink(imagePath, (err) => {
+            if (err && err.code !== "ENOENT") {
+                console.error("Image cleanup error:", err.message);
+            }
+        });
+    }
 }
 
 
@@ -352,7 +383,7 @@ app.get("/new", requireAuth, (req, res) => {
 app.post("/new", requireAuth, upload.single("image"), async (req, res) => {
     try {
         const { title, content } = req.body;
-        const image = req.file ? `/images/${req.file.filename}` : undefined;
+        const image = req.file ? (req.file.path || `/images/${req.file.filename}`) : undefined;
 
         const newPost = new Post({
             title,
@@ -441,7 +472,7 @@ app.post("/posts/:id/edit", requireAuth, upload.single("image"), async (req, res
             if (existingPost.image) {
                 deleteImageFile(existingPost.image);
             }
-            updateData.image = `/images/${req.file.filename}`;
+            updateData.image = req.file.path || `/images/${req.file.filename}`;
         }
 
         await Post.findByIdAndUpdate(
