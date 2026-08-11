@@ -141,7 +141,7 @@ pen-and-pixel/
    ```
 
 5. **Access the application**
-   Open your browser and navigate to `http://localhost:3000`.
+   Open your browser and navigate to https://pen-and-pixel.onrender.com
 
 ---
 
