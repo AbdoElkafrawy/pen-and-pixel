@@ -122,9 +122,9 @@ pen-and-pixel/
    # API Ninjas key for Quotes
    API_NINJAS_KEY=your_api_ninjas_key_here
 
-   # Admin Authentication
-   ADMIN_PASSWORD=penandpixel123
-   SESSION_SECRET=your_random_session_secret_key
+   # Admin Authentication (choose your own strong password and session secret)
+   ADMIN_PASSWORD=your_secure_admin_password_here
+   SESSION_SECRET=your_random_session_secret_key_here
    ```
 
 4. **Start the application**
