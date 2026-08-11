@@ -1,20 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/css/style.css">
-
-    <title>🖋️ Pen & Pixel</title>
+    <%- include("partials/head", { title: "✏️ Edit Post — Pen & Pixel" }) %>
 </head>
 <body>
 
-        <!-- 👇 HEADER and a button to return to home page 👇 -->
-    <header>
-        <h1>🖋️ Pen & Pixel</h1>
-        <a href="/" class="new-post-btn">← Back to Home</a>
-    </header>
-        <main class="form-container"> 
+    <%- include("partials/header") %>
+
+    <main class="form-container"> 
         <h2 class="form-heading">✏️ Edit Post</h2>
         
         <form 
@@ -51,15 +44,13 @@
                 <p id="content-counter" class="counter">0 / 5000</p>
             </div>
 
-            <% if (post.image) { %>
-                <div class="form-group">
-                    <label>Current image</label>
-                    <img src="<%= post.image %>" alt="Current image" class="post-image">
-                </div>
-            <% } %>
-
             <div class="form-group">
-                <label for="image">Replace Image</label>
+                <label for="image">Replace Cover Image (Optional)</label>
+                <% if (post.image) { %>
+                    <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 8px;">
+                        Current image: <a href="<%= post.image %>" target="_blank">View image</a>
+                    </p>
+                <% } %>
                 <input
                     id="image"
                     type="file"
@@ -72,10 +63,8 @@
                 <button type="submit" class="submit-btn">Save Changes</button>
                 <a href="/" class="cancel-btn">Cancel</a>
             </div>
+
         </form>
     </main>
-         
-    <script src="/js/script.js"></script>
 
-</body>
-</html>
+    <%- include("partials/footer") %>

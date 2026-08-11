@@ -1,188 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Link to the external stylesheet served from the "public/css" folder
-         (works because app.use(express.static("public")) exposes it at /css/style.css) -->
-    <link rel="stylesheet" href="/css/style.css">
-
-    <title>🖋️ Pen & Pixel</title>
-
+    <%- include("partials/head", { title: "🖋️ Pen & Pixel — Modern Blog" }) %>
 </head>
 <body>
 
-    <header>
-        <h1> Pen & Pixel</h1>
-        
-         <div class="header-actions">
-
-     <form action ="/" method="GET" class="search-form">
-       <input type="search" 
-               name="search" 
-               placeholder="search posts..."
-               value="<%= search || '' %>"
-               > 
-
-     </form> 
-
-     <% if (search) { %>
-    <a href="/" class="clear-search-btn">Clear Search</a>
-<% } %>
-
-        <a href="/new" class="new-post-btn">
-             + New Post
-        </a>
-</div>
-    </header>
+    <%- include("partials/header") %>
 
     <main>
+        <!-- =======================================================
+                            HERO SECTION
+        ======================================================= -->
         <section class="hero">
+            <h2>Every great creation begins with a single thought.</h2>
+            <p>Write yours.</p>
 
-    <h2>Every great creation begins with a single thought.</h2>
-
-    <p>
-        Write yours.
-    </p>
-
-<% if (weather) { %>
-<!--showing the weather card-->
-
-   <div class="weather-card">
-    <h3>📍 <%= weather.city %></h3>
-
-    <div class="weather-temp">
-        <%= Math.round(weather.temperature) %>°C
-    </div>
-
-    <p class="weather-desc"><%= weather.description %></p>
-
-    <p class="weather-feels">
-        Feels like <strong><%= Math.round(weather.feelsLike) %>°C</strong>
-    </p>
-</div>
-<% } else { %>
-
-    <div class="weather-card">
-        <p>Weather is currently unavailable.</p>
-    </div>
-
-<% } %>
-    <a href="/new" class="hero-btn">
-    Start Writing
-    </a>
-
-<section class="quote-card">
-
-    <h2>💬 Quote of the Day</h2>
-
-    <blockquote>
-        "<%= quote.text %>"
-    </blockquote>
-
-    <p class="quote-author">
-        — <%= quote.author %>
-    </p>
-
-</section>
-
-</section>
-
-<section class="posts">
-
-    <% if (search) { %>
-
-    <h2 class="posts-heading">
-    Search Results for "<%= search %>" — <%= posts.length %> posts
-    </h2>
-    <% } else { %>
-
-    <h2 class="posts-heading">
-        Latest Posts
-    </h2>
-
-<% } %>
-    
-    <% if (posts.length === 0) { %>
-
-    <% if (search) { %>
-
-        <p class="empty-message">
-            No posts found for "<%= search %>".
-        </p>
-
-    <% } else { %>
-
-        <p class="empty-message">
-            No posts yet. Be the first to write one!
-        </p>
-
-    <% } %>
-
-<% } %>
-
-    <!-- EJS scriptlet tag <% %>: runs raw JavaScript, outputs nothing itself.Here it starts a loop over the "posts" array passed in from
-res.render("home", { posts }) in the server code. -->
-    <% posts.forEach((post) => { %>
-
-    <article class="post-card">
-    <div class="post-header">
-        <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
-       <p class="post-meta">
-        📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
-        </p>
-    </div>
-             <% if (post.image) { %>
-    <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
-        <% } %>
-    
-
-    <div class="post-body">
-        <p>
-            <% if (post.content.length > 200) { %>
-                <%= post.content.substring(0, 200) %>...
+            <!-- Weather Widget (IP Geolocation + Open-Meteo API) -->
+            <% if (weather) { %>
+                <div class="weather-card">
+                    <h3>📍 <%= weather.city %></h3>
+                    <div class="weather-temp">
+                        <%= Math.round(weather.temperature) %>°C
+                    </div>
+                    <p class="weather-desc"><%= weather.description %></p>
+                    <p class="weather-feels">
+                        Feels like <strong><%= Math.round(weather.feelsLike) %>°C</strong>
+                    </p>
+                </div>
             <% } else { %>
-                <%= post.content %>
+                <div class="weather-card">
+                    <p>Weather is currently unavailable.</p>
+                </div>
             <% } %>
-        </p>
-    </div>
 
-    <div class="post-footer">
-        <a href="/posts/<%= post.id %>" class="read-more">Read More →</a>
-        
-        <div class="post-actions">
-            <a class="edit-btn" href="/posts/<%= post.id %>/edit">Edit</a>
-            <form action="/posts/<%= post.id %>/delete" method="POST">
-                <button class="delete-btn" onclick="return confirm('Delete this post?')" type="submit">
-                    Delete
-                </button>
-            </form>
-        </div>
-    </div>
-</article>
-<% }); %>
+            <% if (isAdmin) { %>
+                <a href="/new" class="hero-btn">Start Writing</a>
+            <% } %>
+
+            <!-- Quote of the Day Widget (API Ninjas) -->
+            <% if (quote) { %>
+                <section class="quote-card">
+                    <h2>💬 Quote of the Day</h2>
+                    <blockquote>"<%= quote.text %>"</blockquote>
+                    <p class="quote-author">— <%= quote.author %></p>
+                </section>
+            <% } %>
+        </section>
 
 
+        <!-- =======================================================
+                            POSTS FEED
+        ======================================================= -->
+        <section class="posts">
 
-</section>
+            <% if (search) { %>
+                <h2 class="posts-heading">
+                    Search Results for "<%= search %>" — <%= posts.length %> <%= posts.length === 1 ? 'post' : 'posts' %>
+                </h2>
+            <% } else { %>
+                <h2 class="posts-heading">Latest Posts</h2>
+            <% } %>
+            
+            <% if (posts.length === 0) { %>
+                <% if (search) { %>
+                    <p class="empty-message">No posts found matching "<%= search %>".</p>
+                <% } else { %>
+                    <p class="empty-message">No posts yet. Be the first to write one!</p>
+                <% } %>
+            <% } %>
 
+            <!-- Loop over all blog posts -->
+            <% posts.forEach((post) => { %>
+                <article class="post-card">
+                    <div class="post-header">
+                        <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
+                        <p class="post-meta">
+                            📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
+                        </p>
+                    </div>
+
+                    <% if (post.image) { %>
+                        <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
+                    <% } %>
+
+                    <div class="post-body">
+                        <p>
+                            <% if (post.content.length > 200) { %>
+                                <%= post.content.substring(0, 200) %>...
+                            <% } else { %>
+                                <%= post.content %>
+                            <% } %>
+                        </p>
+                    </div>
+
+                    <div class="post-footer">
+                        <a href="/posts/<%= post.id %>" class="read-more">Read More &rarr;</a>
+
+                        <div class="post-footer-right">
+                            <!-- Clickable comment badge -->
+                            <a href="/posts/<%= post.id %>#comments" class="comments-badge" title="View comments">
+                                💬 <span class="comment-count"><%= (post.comments || []).length %></span>
+                            </a>
+
+                            <!-- Interactive Like/Unlike button -->
+                            <button
+                                class="like-btn"
+                                data-post-id="<%= post.id %>"
+                                aria-label="Like this post"
+                            >
+                                ❤️ <span class="like-count"><%= post.likes || 0 %></span>
+                            </button>
+
+                            <!-- Admin Controls -->
+                            <% if (isAdmin) { %>
+                                <div class="post-actions">
+                                    <a class="edit-btn" href="/posts/<%= post.id %>/edit">Edit</a>
+                                    <form action="/posts/<%= post.id %>/delete" method="POST">
+                                        <button class="delete-btn" onclick="return confirm('Delete this post?')" type="submit">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </article>
+            <% }); %>
+
+        </section>
     </main>
 
-
-
-
-
-
-
-<footer>
-
-</footer>
-
-</body>
-</html>
-
+    <%- include("partials/footer") %>

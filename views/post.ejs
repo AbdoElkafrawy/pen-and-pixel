@@ -1,47 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/css/style.css">
-
-    <title>🖋️ Pen & Pixel</title>
-     
-
+    <%- include("partials/head", { title: post.title + " — Pen & Pixel" }) %>
 </head>
 <body>
 
-    <header>
-        <h1>🖋️ Pen & Pixel</h1>
-        <a href="/" class="new-post-btn">← Back to Home</a>
-    </header>
+    <%- include("partials/header") %>
 
     <main class="form-container"> 
      
         <h1><%= post.title %></h1>
 
         <% if (post.image) { %>
-            <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
+            <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image single-post-image">
         <% } %>
 
-        <p class="post-meta single">📅 <%= post.createdAtDisplay || post.createdAt %></p>
+        <p class="post-meta single">
+            📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
+        </p>
 
-        <p><%= post.content %></p>
+        <p class="post-body"><%= post.content %></p>
 
-        <!-- 👇 edit & delete post action buttons 👇 -->
-    <div class="post-actions">
-        <a class="edit-btn" href="/posts/<%= post.id %>/edit">Edit</a>
-        
-        <form action="/posts/<%= post.id %>/delete" method="POST">
-            <button class="delete-btn" onclick="return confirm('Delete this post?')" type="submit">
-                Delete
+        <!-- Like button and Admin actions -->
+        <div class="single-post-footer">
+            <button
+                class="like-btn like-btn-large"
+                data-post-id="<%= post._id %>"
+                aria-label="Like this post"
+            >
+                ❤️ <span class="like-count"><%= post.likes || 0 %></span> Likes
             </button>
-        </form>
-    </div>
+
+            <% if (isAdmin) { %>
+                <div class="post-actions">
+                    <a class="edit-btn" href="/posts/<%= post._id %>/edit">Edit</a>
+                    <form action="/posts/<%= post._id %>/delete" method="POST">
+                        <button class="delete-btn" onclick="return confirm('Delete this post?')" type="submit">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- =======================================================
+                            COMMENTS SECTION
+        ======================================================= -->
+        <section class="comments-section" id="comments">
+            <h3>💬 Comments (<%= (post.comments || []).length %>)</h3>
+
+            <!-- List of existing comments -->
+            <div class="comments-list">
+                <% if (!post.comments || post.comments.length === 0) { %>
+                    <p class="no-comments">No comments yet. Be the first to join the discussion!</p>
+                <% } else { %>
+                    <% post.comments.forEach(comment => { %>
+                        <div class="comment-card">
+                            <div class="comment-header">
+                                <span class="comment-author">👤 Anonymous</span>
+                                <span class="comment-date">
+                                    <%= new Date(comment.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }) %>
+                                </span>
+                            </div>
+
+                            <p class="comment-text"><%= comment.text %></p>
+
+                            <% if (isAdmin) { %>
+                                <form action="/posts/<%= post._id %>/comments/<%= comment._id %>/delete" method="POST" class="delete-comment-form">
+                                    <button type="submit" class="delete-comment-btn" onclick="return confirm('Delete this comment?')">
+                                        🗑️ Delete
+                                    </button>
+                                </form>
+                            <% } %>
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+
+            <!-- Form to post a new comment -->
+            <form action="/posts/<%= post._id %>/comments" method="POST" class="add-comment-form">
+                <h4>✍️ Leave a Comment</h4>
+                <div class="form-group">
+                    <textarea
+                        name="text"
+                        placeholder="Write your comment..."
+                        required
+                        rows="3"
+                    ></textarea>
+                </div>
+                <button type="submit" class="submit-btn comment-submit-btn">Post Comment</button>
+            </form>
+        </section>
 
     </main>
-         
-    <script src="/js/script.js"></script>
 
-</body>
-</html>
+    <%- include("partials/footer") %>

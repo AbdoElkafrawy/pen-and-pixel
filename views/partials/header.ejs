@@ -1,0 +1,31 @@
+<header>
+    <h1>🖋️ Pen &amp; Pixel</h1>
+    
+    <div class="header-actions">
+
+        <!-- Search Bar -->
+        <form action="/" method="GET" class="search-form">
+            <input 
+                type="search" 
+                name="search" 
+                placeholder="Search posts..."
+                value="<%= typeof search !== 'undefined' && search ? search : '' %>"
+            > 
+        </form> 
+
+        <% if (typeof search !== 'undefined' && search) { %>
+            <a href="/" class="clear-search-btn">Clear Search</a>
+        <% } %>
+
+        <!-- Session-based Admin controls -->
+        <% if (isAdmin) { %>
+            <a href="/new" class="new-post-btn">+ New Post</a>
+            <form action="/logout" method="POST" style="margin:0;">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        <% } else { %>
+            <a href="/login" class="login-link">Admin Login</a>
+        <% } %>
+
+    </div>
+</header>

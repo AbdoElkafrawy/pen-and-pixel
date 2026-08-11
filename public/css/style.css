@@ -1,590 +1,187 @@
+/* =======================================================
+                  1. GLOBAL & BASE STYLES
+   ======================================================= */
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
-    font-family:'Poppins',sans-serif;
-    background:#f5f5f5;
-    color:#333;
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f5f5f5;
+    color: #333;
 }
 
-header{
-
-    background:#111827;
-
-    color:white;
-
-    padding:20px 60px;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    position:sticky;
-
-    top:0;
-
-    z-index:100;
-
-}
-
-header h1{
-
-    font-size:2rem;
-
-    font-weight:700;
-
-}
-
-
-.new-post-btn{
-
-    text-decoration:none;
-
-    background:#2563eb;
-
-    color:white;
-
-    padding:12px 22px;
-
-    border-radius:10px;
-
-    font-weight:600;
-
-    transition:.25s ease;
-
-}
-
-.new-post-btn:hover{
-
-    background:#1d4ed8;
-
-    transform:translateY(-2px);
-
-}
-
-
-main{
-    width:90%;
-    max-width:1000px;
-    margin:40px auto;
-}
-
-.hero{
-
-    text-align:center;
-
-    padding:60px 0;
-
-}
-
-
-.hero h2{
-
-    font-size:3rem;
-
-    color:#111827;
-
-    margin-bottom:15px;
-
-}
-
-.hero p{
-
-    font-size:1.2rem;
-
-    color:#6b7280;
-
-}
-
-.hero-btn{
-
-    display:inline-block;
-
-    margin-top:30px;
-
-    background:#2563eb;
-
-    color:white;
-
-    text-decoration:none;
-
-    padding:15px 30px;
-
-    border-radius:10px;
-
-    font-weight:600;
-
-    transition:.3s;
-
-}
-
-.hero-btn:hover{
-
-    background:#1d4ed8;
-
-    transform:translateY(-3px);
-
-}
-
-
-
-article{
-    background:white;
-    border-radius:12px;
-    padding:25px;
-    margin-bottom:25px;
-    box-shadow:0 4px 10px rgba(0,0,0,.08);
-}
-
-article h2{
-    margin-bottom:15px;
-    color:#2563eb;
-}
-
-article p{
-    line-height:1.7;
-    margin-bottom:20px;
-}
-
-.post-actions{
-
-    display:flex;
-
-    gap:15px;
-
-    margin-top:20px;
-
-}
-
-.posts-heading{
-
-    margin-bottom:25px;
-
-    color:#111827;
-
-}
-
-.empty-message{
-
-    background:white;
-
-    padding:40px;
-
-    text-align:center;
-
-    border-radius:12px;
-
-    color:#6b7280;
-
-    box-shadow:0 4px 10px rgba(0,0,0,.08);
-
-}
-
-
-.edit-btn,
-.delete-btn{
-
-    text-decoration:none;
-
-    border:none;
-
-    padding:10px 18px;
-
-    border-radius:8px;
-
-    cursor:pointer;
-
-    color:white;
-
-    font-size:.95rem;
-
-    transition:.25s;
-
-}
-
-.edit-btn{
-
-    background:#f59e0b;
-
-}
-.edit-btn{
-
-    background:#f59e0b;
-
-}
-
-.edit-btn:hover{
-
-    background:#d97706;
-
-}
-
-.delete-btn:hover{
-
-    background:#dc2626;
-
-}
-
-article{
-
-    transition:.3s;
-
-}
-article:hover{
-
-    transform:translateY(-5px);
-
-    box-shadow:0 10px 20px rgba(0,0,0,.15);
-
-}
-
-.counter {
-    margin-top: 8px;
-    text-align: right;
-    font-size: 0.9rem;
-    color: #6b7280;
-    transition: color 0.2s ease;
-}
-
-.counter.warning {
-    color: #f59e0b;
-}
-
-.counter.danger {
-    color: #ef4444;
-}
-
-.read-more {
-    display: inline-block;
-    color: #2563eb;
-    text-decoration: none;
-    font-weight: 600;
-    margin: 10px 0 15px 0;
-    transition: color 0.3s;
-}
-
-.read-more:hover {
-    color: #1d4ed8;
-    text-decoration: underline;
-}
-
-
-/* Add this at the very end of style.css */
-
-/* Submit button - blue */
-.submit-btn {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 14px 28px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: .25s ease;
-}
-
-.submit-btn:hover {
-    background: #1d4ed8;
-    transform: translateY(-2px);
-}
-
-/* Cancel button - gray */
-.cancel-btn {
-    background: #6b7280;
-    color: white;
-    text-decoration: none;
-    padding: 14px 28px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: .25s ease;
-    display: inline-block;
-    text-align: center;
-}
-
-.cancel-btn:hover {
-    background: #4b5563;
-    transform: translateY(-2px);
-}
-
-/* Add this at the very end of style.css */
-
-/* ===== FORM STYLES ===== */
-
-/* Container for the form */
-.form-container {
-    background: white;
-    border-radius: 12px;
-    padding: 40px;
-    max-width: 800px;
+main {
+    width: 90%;
+    max-width: 1000px;
     margin: 40px auto;
-    box-shadow: 0 4px 10px rgba(0,0,0,.08);
 }
 
-/* Form heading */
-.form-heading {
-    font-size: 2rem;
-    color: #111827;
-    margin-bottom: 30px;
-    text-align: center;
-}
 
-/* Each form group (label + input) */
-.form-group {
-    margin-bottom: 25px;
-}
+/* =======================================================
+                2. HEADER & NAVIGATION
+   ======================================================= */
 
-/* Labels */
-.form-group label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #111827;
-    font-size: 1rem;
-}
-
-/* Required field indicator */
-.required {
-    color: #ef4444;
-    margin-left: 4px;
-}
-
-/* Input fields and textareas */
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: 'Poppins', sans-serif;
-    transition: border-color 0.3s ease;
-    background: #fafafa;
-}
-
-/* Input focus effect */
-.form-group input:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: #2563eb;
-    background: white;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-}
-
-/* Textarea specific */
-.form-group textarea {
-    min-height: 200px;
-    resize: vertical;
-}
-
-/* Character counter positioning */
-.counter {
-    margin-top: 8px;
-    text-align: right;
-    font-size: 0.9rem;
-    color: #6b7280;
-    transition: color 0.2s ease;
-}
-
-.counter.warning {
-    color: #f59e0b;
-}
-
-.counter.danger {
-    color: #ef4444;
-}
-
-/* Form actions (buttons at bottom) */
-.form-actions {
-    display: flex;
-    gap: 15px;
-    margin-top: 30px;
-    justify-content: flex-start;
-}
-
-/* Submit button - blue */
-.submit-btn {
-    background: #2563eb;
+header {
+    background: #111827;
     color: white;
-    border: none;
-    padding: 14px 32px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: .25s ease;
-    font-family: 'Poppins', sans-serif;
-}
-
-.submit-btn:hover {
-    background: #1d4ed8;
-    transform: translateY(-2px);
-}
-
-/* Cancel button - gray */
-.cancel-btn {
-    background: #6b7280;
-    color: white;
-    text-decoration: none;
-    padding: 14px 32px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: .25s ease;
-    display: inline-block;
-    text-align: center;
-    font-family: 'Poppins', sans-serif;
-}
-
-.cancel-btn:hover {
-    background: #4b5563;
-    transform: translateY(-2px);
-}
-
-
-/* ===== timestamp styling ===== */
-
-.post-meta {
-    color: #6b7280;
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-    font-weight: 400;
-}
-
-.post-meta.single {
-    font-size: 1rem;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #f3f4f6;
-}
-
-/* Add this at the very end of style.css */
-
-/* ===== POST CARDS ===== */
-
-/* Each post as a card */
-.post-card {
-    background: white;
-    border-radius: 12px;
-    padding: 30px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 10px rgba(0,0,0,.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.post-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,.15);
-}
-
-/* Header section of the card */
-.post-header {
-    margin-bottom: 15px;
-}
-
-.post-header h2 {
-    color: #2563eb;
-    font-size: 1.8rem;
-    margin-bottom: 5px;
-}
-
-.post-header h2 a {
-    color: #2563eb;
-    text-decoration: none;
-}
-
-.post-header h2 a:hover {
-    text-decoration: underline;
-}
-
-/* Body section of the card */
-.post-body {
-    margin-bottom: 20px;
-    line-height: 1.7;
-    color: #374151;
-}
-
-.post-body p {
-    font-size: 1rem;
-}
-
-/* Footer section of the card */
-.post-footer {
+    padding: 20px 60px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    padding-top: 20px;
-    border-top: 2px solid #f3f4f6;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-/* Read More link */
-.read-more {
-    display: inline-block;
-    color: #2563eb;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
+header h1 {
+    font-size: 2rem;
+    font-weight: 700;
 }
 
-.read-more:hover {
-    color: #1d4ed8;
-    text-decoration: underline;
-}
-
-/* Post actions (Edit/Delete buttons) */
-.post-actions {
+.header-actions {
     display: flex;
-    gap: 10px;
     align-items: center;
+    gap: 15px;
 }
 
-/* Edit button */
-.edit-btn {
-    background: #f59e0b;
-    color: white;
+.new-post-btn {
     text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 0.9rem;
+    background: #2563eb;
+    color: white;
+    padding: 12px 22px;
+    border-radius: 10px;
     font-weight: 600;
-    transition: 0.25s ease;
-    border: none;
-    cursor: pointer;
+    transition: .25s ease;
 }
 
-.edit-btn:hover {
-    background: #d97706;
+.new-post-btn:hover {
+    background: #1d4ed8;
     transform: translateY(-2px);
 }
 
-/* Delete button */
-.delete-btn {
-    background: #ef4444;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
+.login-link {
+    color: #9ca3af;
+    text-decoration: none;
     font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
+    font-weight: 500;
     transition: 0.25s ease;
 }
 
-.delete-btn:hover {
+.login-link:hover {
+    color: white;
+}
+
+.logout-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: 0.25s ease;
+}
+
+.logout-btn:hover {
     background: #dc2626;
     transform: translateY(-2px);
 }
 
-/* Weather Card */
+
+/* =======================================================
+                  3. SEARCH BAR
+   ======================================================= */
+
+.search-form {
+    display: flex;
+    align-items: center;
+}
+
+.search-form input {
+    width: 220px;
+    padding: 10px 14px;
+    border: 2px solid #374151;
+    border-radius: 8px;
+    background: #1f2937;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: 0.25s ease;
+}
+
+.search-form input::placeholder {
+    color: #9ca3af;
+}
+
+.search-form input:focus {
+    border-color: #2563eb;
+    background: #111827;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.clear-search-btn {
+    margin-left: 10px;
+    color: #9ca3af;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: 0.25s ease;
+}
+
+.clear-search-btn:hover {
+    color: white;
+}
+
+
+/* =======================================================
+                  4. HERO SECTION
+   ======================================================= */
+
+.hero {
+    text-align: center;
+    padding: 60px 0;
+}
+
+.hero h2 {
+    font-size: 3rem;
+    color: #111827;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: #6b7280;
+}
+
+.hero-btn {
+    display: inline-block;
+    margin-top: 30px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: .3s;
+}
+
+.hero-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-3px);
+}
+
+
+/* =======================================================
+             5. WEATHER & QUOTE WIDGETS
+   ======================================================= */
+
 .weather-card {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -653,60 +250,496 @@ article:hover{
     color: #666;
 }
 
-/* ===== SEARCH ===== */
 
-.search-form {
+/* =======================================================
+               6. POST CARDS & FEED
+   ======================================================= */
+
+.posts-heading {
+    margin-bottom: 25px;
+    color: #111827;
+}
+
+.empty-message {
+    background: white;
+    padding: 40px;
+    text-align: center;
+    border-radius: 12px;
+    color: #6b7280;
+    box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
+
+.post-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,.15);
+}
+
+.post-header {
+    margin-bottom: 15px;
+}
+
+.post-header h2 {
+    color: #2563eb;
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.post-header h2 a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.post-header h2 a:hover {
+    text-decoration: underline;
+}
+
+.post-meta {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    font-weight: 400;
+}
+
+.post-meta.single {
+    font-size: 1rem;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.post-body {
+    margin-bottom: 20px;
+    line-height: 1.7;
+    color: #374151;
+}
+
+.post-body p {
+    font-size: 1rem;
+}
+
+.post-footer {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding-top: 20px;
+    border-top: 2px solid #f3f4f6;
+}
+
+.post-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.read-more {
+    display: inline-block;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.read-more:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+
+/* =======================================================
+               7. IMAGES (Feed vs Single)
+   ======================================================= */
+
+/* Homepage feed image: uniform max-height with smooth crop */
+.post-image {
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+/* Single post page: full natural height */
+.single-post-image {
+    max-height: none;
+    height: auto;
+}
+
+
+/* =======================================================
+               8. BUTTONS & ACTIONS
+   ======================================================= */
+
+.post-actions {
+    display: flex;
+    gap: 10px;
     align-items: center;
 }
 
-.search-form input {
-    width: 220px;
-    padding: 10px 14px;
-    border: 2px solid #374151;
-    border-radius: 8px;
-    background: #1f2937;
+.edit-btn {
+    background: #f59e0b;
     color: white;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.95rem;
-    outline: none;
-    transition: 0.25s ease;
-}
-
-.search-form input::placeholder {
-    color: #9ca3af;
-}
-
-.search-form input:focus {
-    border-color: #2563eb;
-    background: #111827;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-}
-
-
-.clear-search-btn {
-    margin-left: 10px;
-    color: #9ca3af;
     text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 600;
+    transition: 0.25s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.edit-btn:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
     transition: 0.25s ease;
 }
 
-.clear-search-btn:hover {
+.delete-btn:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+.submit-btn {
+    background: #2563eb;
     color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: .25s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.submit-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.cancel-btn {
+    background: #6b7280;
+    color: white;
+    text-decoration: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: .25s ease;
+    display: inline-block;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+.cancel-btn:hover {
+    background: #4b5563;
+    transform: translateY(-2px);
 }
 
 
-.header-actions {
+/* =======================================================
+               9. FORM STYLES
+   ======================================================= */
+
+.form-container {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 40px auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
+
+.form-heading {
+    font-size: 2rem;
+    color: #111827;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #111827;
+    font-size: 1rem;
+}
+
+.required {
+    color: #ef4444;
+    margin-left: 4px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.3s ease;
+    background: #fafafa;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.form-group textarea {
+    min-height: 200px;
+    resize: vertical;
+}
+
+.counter {
+    margin-top: 8px;
+    text-align: right;
+    font-size: 0.9rem;
+    color: #6b7280;
+    transition: color 0.2s ease;
+}
+
+.counter.warning {
+    color: #f59e0b;
+}
+
+.counter.danger {
+    color: #ef4444;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    justify-content: flex-start;
+}
+
+.login-error {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+
+/* =======================================================
+               10. LIKE & COMMENT BADGES
+   ======================================================= */
+
+.single-post-footer {
     display: flex;
     align-items: center;
     gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #f3f4f6;
+    flex-wrap: wrap;
+}
+
+.comments-badge {
+    background: none;
+    border: 2px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.9rem;
+    font-family: 'Poppins', sans-serif;
+    text-decoration: none;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.25s ease;
+}
+
+.comments-badge:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    transform: scale(1.05);
+}
+
+.like-btn {
+    background: none;
+    border: 2px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.9rem;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.25s ease;
+}
+
+.like-btn:hover:not(:disabled) {
+    border-color: #ef4444;
+    color: #ef4444;
+    transform: scale(1.05);
+}
+
+.like-btn.liked {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #ef4444;
+    cursor: pointer;
+}
+
+.like-btn-large {
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    border-radius: 25px;
 }
 
 
-@media (max-width: 700px) {
+/* =======================================================
+               11. COMMENTS SECTION
+   ======================================================= */
 
+.comments-section {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid #e5e7eb;
+}
+
+.comments-section h3 {
+    font-size: 1.4rem;
+    color: #111827;
+    margin-bottom: 20px;
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 35px;
+}
+
+.no-comments {
+    color: #6b7280;
+    font-style: italic;
+    font-size: 0.95rem;
+}
+
+.comment-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px 20px;
+    position: relative;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.comment-author {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+.comment-date {
+    font-size: 0.82rem;
+    color: #9ca3af;
+}
+
+.comment-text {
+    color: #4b5563;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+}
+
+.delete-comment-form {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.delete-comment-btn {
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.delete-comment-btn:hover {
+    background: #fef2f2;
+}
+
+.add-comment-form {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.add-comment-form h4 {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #1e293b;
+}
+
+.add-comment-form textarea {
+    min-height: 90px;
+    background: white;
+}
+
+.comment-submit-btn {
+    padding: 10px 24px;
+    font-size: 0.95rem;
+}
+
+
+/* =======================================================
+               12. RESPONSIVE DESIGN
+   ======================================================= */
+
+@media (max-width: 700px) {
     header {
         padding: 15px 20px;
         flex-wrap: wrap;
@@ -732,19 +765,3 @@ article:hover{
         width: 100%;
     }
 }
-
-.post-image {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    display: block;
-}
-
-
-
-
-
-
-
-

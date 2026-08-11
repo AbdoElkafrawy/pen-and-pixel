@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", { title: "🔒 Admin Login — Pen & Pixel" }) %>
+</head>
+<body>
+
+    <%- include("partials/header") %>
+
+    <main class="form-container" style="max-width: 460px;">
+
+        <h2 class="form-heading">🔒 Admin Login</h2>
+
+        <!-- Login Failure Error Alert -->
+        <% if (error) { %>
+            <div class="login-error">
+                ❌ <%= error %>
+            </div>
+        <% } %>
+
+        <form action="/login" method="POST" class="post-form">
+
+            <div class="form-group">
+                <label for="password">Password <span class="required">*</span></label>
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    placeholder="Enter admin password..."
+                    required
+                    autofocus
+                >
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">Log In</button>
+                <a href="/" class="cancel-btn">Cancel</a>
+            </div>
+
+        </form>
+
+    </main>
+
+    <%- include("partials/footer") %>

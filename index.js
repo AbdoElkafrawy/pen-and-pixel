@@ -1,29 +1,121 @@
 // =======================================================
-//                     IMPORTS
+//                    1. IMPORTS & DEPENDENCIES
 // =======================================================
 
-// Express framework for routing and handling HTTP requests
+// Express framework for server routing and HTTP request handling
 import express from "express";
 import path from "path";
 import fs from "fs";
 
-// Template engine used to render dynamic HTML pages
-import ejs from "ejs";
-
-// MongoDB ODM (Object Data Modeling)
+// Mongoose ODM for MongoDB data modeling and interaction
 import mongoose from "mongoose";
 
-// HTTP client for making requests to external APIs
+// Axios for making server-to-server requests to external APIs
 import axios from "axios";
 
-// Loads environment variables from the .env file
+// Dotenv for loading secrets and environment variables from .env
 import "dotenv/config";
 
-// Local helper function used to calculate a post's reading time
+// File upload middleware (images)
+import multer from "multer";
+
+// Session middleware for managing user authentication state
+import session from "express-session";
+
+// Password hashing utility for secure credential verification
+import bcrypt from "bcryptjs";
+
+// Custom helper: calculates estimated reading time for post content
 import calculateReadingTime from "./helpers/readingTime.js";
 
-// Middleware for handling file uploads
-import multer from "multer";
+// Custom middleware: protects admin-only routes from unauthorized access
+import requireAuth from "./middleware/requireAuth.js";
+
+
+// =======================================================
+//              2. APPLICATION CONFIGURATION
+// =======================================================
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Configure EJS as the view engine
+app.set("view engine", "ejs");
+
+// Weather code lookup table returned by the Open-Meteo API
+const weatherCodes = {
+    0: "☀️ Clear Sky",
+    1: "🌤️ Mainly Clear",
+    2: "⛅ Partly Cloudy",
+    3: "☁️ Overcast",
+    45: "🌫️ Fog",
+    61: "🌧️ Rain",
+    80: "🌦️ Rain Showers",
+    95: "⛈️ Thunderstorm"
+};
+
+
+// =======================================================
+//           3. DATABASE CONNECTION & SCHEMAS
+// =======================================================
+
+// Connect to MongoDB (local fallback or cloud Atlas URI)
+await mongoose.connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/blog");
+
+// Hash the admin password once on startup using 10 salt rounds
+const ADMIN_HASH = await bcrypt.hash(process.env.ADMIN_PASSWORD || "penandpixel123", 10);
+
+// Defines the MongoDB schema for blog posts
+const postSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
+    content: {
+        type: String,
+        required: true
+    },
+
+    image: {
+        type: String,
+        required: false
+    },
+
+    createdAt: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
+
+    likes: {
+        type: Number,
+        default: 0
+    },
+
+    comments: [
+        {
+            text: {
+                type: String,
+                required: true,
+                trim: true
+            },
+            createdAt: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ]
+});
+
+// Compile the Post model
+const Post = mongoose.model("Post", postSchema);
+
+
+// =======================================================
+//             4. FILE UPLOAD SETUP (Multer)
+// =======================================================
 
 const uploadDir = path.join("public", "images");
 fs.mkdirSync(uploadDir, { recursive: true });
@@ -47,67 +139,11 @@ const upload = multer({
         }
     },
     limits: {
-        fileSize: 5 * 1024 * 1024
+        fileSize: 5 * 1024 * 1024 // 5MB limit
     }
 });
 
-
-// =======================================================
-//                  APPLICATION CONFIGURATION
-// =======================================================
-
-// Weather code lookup table returned by the Open-Meteo API.
-// Instead of displaying numeric codes (0, 1, 2...),
-// we convert them into user-friendly descriptions.
-const weatherCodes = {
-    0: "☀️ Clear Sky",
-    1: "🌤️ Mainly Clear",
-    2: "⛅ Partly Cloudy",
-    3: "☁️ Overcast",
-    45: "🌫️ Fog",
-    61: "🌧️ Rain",
-    80: "🌦️ Rain Showers",
-    95: "⛈️ Thunderstorm"
-};
-
-
-// =======================================================
-//                  DATABASE CONNECTION
-// =======================================================
-
-// Establish a connection with MongoDB before the server starts.
-await mongoose.connect("mongodb://127.0.0.1:27017/blog");
-
-// =======================================================
-//                    MONGOOSE MODELS
-// =======================================================
-
-// Defines how every blog post will be stored in MongoDB.
-const postSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true
-    },
-
-    content: {
-        type: String,
-        required: true
-    },
-
-    image: {
-        type: String,
-        required: false
-    },
-
-    createdAt: {
-        type: Date,
-        required: true
-    }
-});
-
-// Creates the model we'll use throughout the application.
-const Post = mongoose.model("Post", postSchema);
-
+// Helper: safely deletes an associated image file from disk when a post is edited or deleted
 function deleteImageFile(imageUrl) {
     if (!imageUrl) return;
 
@@ -115,82 +151,76 @@ function deleteImageFile(imageUrl) {
 
     fs.unlink(imagePath, (err) => {
         if (err && err.code !== "ENOENT") {
-            console.error("Image delete error:", err);
+            console.error("Image cleanup error:", err.message);
         }
     });
 }
 
 
 // =======================================================
-//                  EXPRESS CONFIGURATION
+//                 5. EXPRESS MIDDLEWARE
 // =======================================================
 
-const app = express();
-const port = process.env.PORT || 3000;
-
-// Serves everything inside /public as static files
+// Serve static assets from the public directory
 app.use(express.static("public"));
 
-// Allows Express to read form data from POST requests
+// Parse URL-encoded form data and JSON payloads
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-// Configure EJS as the application's view engine
-app.set("view engine", "ejs");
+// Session middleware configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET || "fallback_secret_key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    }
+}));
 
+// Global view variables available in all EJS templates
+app.use((req, res, next) => {
+    res.locals.isAdmin = req.session.isAdmin || false;
+    next();
+});
 
-
+// Weather API cache map (1 hour TTL)
 const weatherCache = new Map();
 const WEATHER_CACHE_DURATION = 60 * 60 * 1000;
+
+
 // =======================================================
-//                        ROUTES
+//                       6. ROUTES
 // =======================================================
 
-
-/* ======================================================
-                    HOME PAGE
-====================================================== */
-
+/* -------------------------------------------------------
+   HOME FEED & SEARCH ROUTE
+   ------------------------------------------------------- */
 app.get("/", async (req, res) => {
-    
     try {
-
-        // -----------------------------------------------
-        // Fetch blog posts
-        // -----------------------------------------------
-        const search=req.query.search;
-
+        const search = req.query.search;
         let posts;
 
-        if(search){
-             posts = await Post.find({
-    $or: [
-        {
-            title: {
-                $regex: search,
-                $options: "i"
-            }
-        },
-        {
-            content: {
-                $regex: search,
-                $options: "i"
-            }
-        }
-    ]
-}).sort({ createdAt: -1 });
-        } else{
-            console.log("showing all posts");
+        // Execute regex search if query provided, else fetch all posts
+        if (search) {
+            posts = await Post.find({
+                $or: [
+                    { title: { $regex: search, $options: "i" } },
+                    { content: { $regex: search, $options: "i" } }
+                ]
+            }).sort({ createdAt: -1 });
+        } else {
             posts = await Post.find().sort({ createdAt: -1 });
         }
 
-         const postsWithReadingTime = posts.map(post => {
+        // Attach computed fields: readingTime and formatted display date
+        const postsWithDetails = posts.map(post => {
             const createdAtDate = post.createdAt instanceof Date ? post.createdAt : new Date(post.createdAt);
 
             return {
                 ...post.toObject(),
                 id: post._id.toString(),
                 readingTime: calculateReadingTime(post.content),
-                createdAt: createdAtDate,
                 createdAtDisplay: createdAtDate.toLocaleString("en-US", {
                     year: "numeric",
                     month: "long",
@@ -201,8 +231,7 @@ app.get("/", async (req, res) => {
             };
         });
 
-        // Optional homepage widgets.
-        // If an external API fails, the page should still load.
+        // Detect client IP for geolocation weather widget
         const clientIp = (
             (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "127.0.0.1")
                 .split(",")[0]
@@ -212,18 +241,16 @@ app.get("/", async (req, res) => {
         let weather = null;
         let quote = null;
 
-        const cached = weatherCache.get(clientIp);
-        const cacheIsValid = cached && Date.now() - cached.updatedAt < WEATHER_CACHE_DURATION;
-
-        if (cacheIsValid) {
-            weather = cached.weather;
+        // Weather widget fetching with caching
+        const cachedWeather = weatherCache.get(clientIp);
+        if (cachedWeather && Date.now() - cachedWeather.updatedAt < WEATHER_CACHE_DURATION) {
+            weather = cachedWeather.weather;
         } else {
             try {
                 const defaultLocationUrl = "https://ipwho.is/";
-                let locationUrl =
-                    clientIp === "127.0.0.1" || clientIp === "::1"
-                        ? defaultLocationUrl
-                        : `https://ipwho.is/${clientIp}`;
+                let locationUrl = (clientIp === "127.0.0.1" || clientIp === "::1")
+                    ? defaultLocationUrl
+                    : `https://ipwho.is/${clientIp}`;
 
                 let locationResponse = await axios.get(locationUrl);
                 let location = locationResponse.data;
@@ -238,151 +265,153 @@ app.get("/", async (req, res) => {
                 );
 
                 const weatherData = weatherResponse.data;
-
                 weather = {
                     city: location.city || `${location.region}, ${location.country}`,
                     temperature: Math.round(weatherData.current.temperature_2m),
                     feelsLike: Math.round(weatherData.current.apparent_temperature),
-                    description:
-                        weatherCodes[weatherData.current.weather_code] ?? "Unknown",
+                    description: weatherCodes[weatherData.current.weather_code] ?? "Unknown",
                     updatedAt: weatherData.current.time
                 };
 
-                weatherCache.set(clientIp, {
-                    weather,
-                    updatedAt: Date.now()
-                });
+                weatherCache.set(clientIp, { weather, updatedAt: Date.now() });
             } catch (error) {
                 console.error("Weather API Error:", error.message);
-                console.error("Failed URL:", error.config?.url);
             }
         }
-        // -----------------------------------------------
-        // Quote of the Day
-        // -----------------------------------------------
 
+        // Quote of the day widget fetching
         try {
-
             const quoteResponse = await axios.get(
                 "https://api.api-ninjas.com/v1/quotes",
-                {
-                    headers: {
-                        "X-Api-Key": process.env.API_NINJAS_KEY
-                    }
-                }
+                { headers: { "X-Api-Key": process.env.API_NINJAS_KEY } }
             );
 
-            quote = {
-                text: quoteResponse.data[0].quote,
-                author: quoteResponse.data[0].author,
-                category: quoteResponse.data[0].category
-            };
-
+            if (quoteResponse.data && quoteResponse.data.length > 0) {
+                quote = {
+                    text: quoteResponse.data[0].quote,
+                    author: quoteResponse.data[0].author,
+                    category: quoteResponse.data[0].category
+                };
+            }
         } catch (error) {
-
             console.error("Quote API Error:", error.message);
-
         }
 
-
-        // -----------------------------------------------
-        // Render Homepage
-        // -----------------------------------------------
-
         res.render("home", {
-            posts: postsWithReadingTime,
+            posts: postsWithDetails,
             weather,
             quote,
             search
         });
 
     } catch (error) {
-
         console.error("Homepage Error:", error);
         res.status(500).send("Error loading homepage");
-
     }
 });
 
 
-/* ======================================================
-                  CREATE NEW POST
-====================================================== */
+/* -------------------------------------------------------
+   AUTHENTICATION ROUTES (Admin Login / Logout)
+   ------------------------------------------------------- */
 
-// Display the form
-app.get("/new", (req, res) => {
+app.get("/login", (req, res) => {
+    if (req.session.isAdmin) {
+        return res.redirect("/");
+    }
+    res.render("login", { error: null });
+});
 
-    res.render("new");
+app.post("/login", async (req, res) => {
+    const { password } = req.body;
+    const isMatch = await bcrypt.compare(password, ADMIN_HASH);
 
+    if (isMatch) {
+        req.session.isAdmin = true;
+        res.redirect("/");
+    } else {
+        res.render("login", { error: "Incorrect password. Please try again." });
+    }
+});
+
+app.post("/logout", (req, res) => {
+    req.session.destroy(() => {
+        res.redirect("/");
+    });
 });
 
 
-// Save the new post
-app.post("/new", upload.single("image"), async (req, res) => {
-    console.log(req.file);
-    try {
+/* -------------------------------------------------------
+   CREATE POST ROUTES (Protected)
+   ------------------------------------------------------- */
 
+app.get("/new", requireAuth, (req, res) => {
+    res.render("new");
+});
+
+app.post("/new", requireAuth, upload.single("image"), async (req, res) => {
+    try {
         const { title, content } = req.body;
         const image = req.file ? `/images/${req.file.filename}` : undefined;
-
-        const createdAt = new Date();
 
         const newPost = new Post({
             title,
             content,
             ...(image && { image }),
-            createdAt
+            createdAt: new Date()
         });
 
         await newPost.save();
-
         res.redirect("/");
 
     } catch (error) {
-
-        console.error(error);
+        console.error("Create Post Error:", error);
         res.status(500).send("Error creating post");
-
     }
-
 });
 
 
-/* ======================================================
-                    VIEW SINGLE POST
-====================================================== */
+/* -------------------------------------------------------
+   VIEW SINGLE POST ROUTE
+   ------------------------------------------------------- */
 
 app.get("/posts/:id", async (req, res) => {
-
     try {
-
         const post = await Post.findById(req.params.id);
 
         if (!post) {
             return res.status(404).send("Post not found");
         }
 
-        res.render("post", { post });
+        const createdAtDate = post.createdAt instanceof Date ? post.createdAt : new Date(post.createdAt);
+        const postWithDetails = {
+            ...post.toObject(),
+            id: post._id.toString(),
+            readingTime: calculateReadingTime(post.content),
+            createdAtDisplay: createdAtDate.toLocaleString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            })
+        };
+
+        res.render("post", { post: postWithDetails });
 
     } catch (error) {
-
-        console.error(error);
+        console.error("View Post Error:", error);
         res.status(500).send("Error fetching post");
-
     }
-
 });
 
 
-/* ======================================================
-                      EDIT POST
-====================================================== */
+/* -------------------------------------------------------
+   EDIT POST ROUTES (Protected)
+   ------------------------------------------------------- */
 
-// Display edit form
-app.get("/posts/:id/edit", async (req, res) => {
-
+app.get("/posts/:id/edit", requireAuth, async (req, res) => {
     try {
-
         const post = await Post.findById(req.params.id);
 
         if (!post) {
@@ -392,20 +421,13 @@ app.get("/posts/:id/edit", async (req, res) => {
         res.render("edit", { post });
 
     } catch (error) {
-
-        console.error(error);
-        res.status(500).send("Error fetching post");
-
+        console.error("Edit View Error:", error);
+        res.status(500).send("Error fetching post for edit");
     }
-
 });
 
-
-// Save edited post
-app.post("/posts/:id/edit", upload.single("image"), async (req, res) => {
-
+app.post("/posts/:id/edit", requireAuth, upload.single("image"), async (req, res) => {
     try {
-
         const { title, content } = req.body;
         const existingPost = await Post.findById(req.params.id);
 
@@ -422,35 +444,27 @@ app.post("/posts/:id/edit", upload.single("image"), async (req, res) => {
             updateData.image = `/images/${req.file.filename}`;
         }
 
-        const updatedPost = await Post.findByIdAndUpdate(
+        await Post.findByIdAndUpdate(
             req.params.id,
             updateData,
-            {
-                new: true,
-                runValidators: true
-            }
+            { new: true, runValidators: true }
         );
 
         res.redirect("/");
 
     } catch (error) {
-
-        console.error(error);
+        console.error("Update Post Error:", error);
         res.status(500).send("Error updating post");
-
     }
-
 });
 
 
-/* ======================================================
-                     DELETE POST
-====================================================== */
+/* -------------------------------------------------------
+   DELETE POST ROUTE (Protected)
+   ------------------------------------------------------- */
 
-app.post("/posts/:id/delete", async (req, res) => {
-
+app.post("/posts/:id/delete", requireAuth, async (req, res) => {
     try {
-
         const deletedPost = await Post.findByIdAndDelete(req.params.id);
 
         if (!deletedPost) {
@@ -464,22 +478,118 @@ app.post("/posts/:id/delete", async (req, res) => {
         res.redirect("/");
 
     } catch (error) {
-
-        console.error(error);
+        console.error("Delete Post Error:", error);
         res.status(500).send("Error deleting post");
-
     }
+});
 
+
+/* -------------------------------------------------------
+   INTERACTIVE LIKE & UNLIKE API ROUTES (AJAX / Fetch)
+   ------------------------------------------------------- */
+
+app.post("/like/:id", async (req, res) => {
+    try {
+        const post = await Post.findByIdAndUpdate(
+            req.params.id,
+            { $inc: { likes: 1 } },
+            { new: true }
+        );
+
+        if (!post) {
+            return res.status(404).json({ error: "Post not found" });
+        }
+
+        res.json({ likes: post.likes });
+
+    } catch (error) {
+        console.error("Like API Error:", error.message);
+        res.status(500).json({ error: "Error liking post" });
+    }
+});
+
+app.post("/unlike/:id", async (req, res) => {
+    try {
+        const currentPost = await Post.findById(req.params.id);
+
+        if (!currentPost) {
+            return res.status(404).json({ error: "Post not found" });
+        }
+
+        const newLikeCount = Math.max(0, (currentPost.likes || 1) - 1);
+
+        const post = await Post.findByIdAndUpdate(
+            req.params.id,
+            { likes: newLikeCount },
+            { new: true }
+        );
+
+        res.json({ likes: post.likes });
+
+    } catch (error) {
+        console.error("Unlike API Error:", error.message);
+        res.status(500).json({ error: "Error unliking post" });
+    }
+});
+
+
+/* -------------------------------------------------------
+   COMMENT ROUTES (Add / Delete)
+   ------------------------------------------------------- */
+
+app.post("/posts/:id/comments", async (req, res) => {
+    try {
+        const { text } = req.body;
+
+        if (!text || text.trim().length === 0) {
+            return res.redirect(`/posts/${req.params.id}`);
+        }
+
+        await Post.findByIdAndUpdate(
+            req.params.id,
+            {
+                $push: {
+                    comments: {
+                        text: text.trim(),
+                        createdAt: new Date()
+                    }
+                }
+            }
+        );
+
+        res.redirect(`/posts/${req.params.id}#comments`);
+
+    } catch (error) {
+        console.error("Add Comment Error:", error);
+        res.status(500).send("Error adding comment");
+    }
+});
+
+app.post("/posts/:id/comments/:commentId/delete", requireAuth, async (req, res) => {
+    try {
+        await Post.findByIdAndUpdate(
+            req.params.id,
+            {
+                $pull: {
+                    comments: { _id: req.params.commentId }
+                }
+            }
+        );
+
+        res.redirect(`/posts/${req.params.id}#comments`);
+
+    } catch (error) {
+        console.error("Delete Comment Error:", error);
+        res.status(500).send("Error deleting comment");
+    }
 });
 
 
 // =======================================================
-//                    START SERVER
+//                  7. START SERVER
 // =======================================================
 
 app.listen(port, () => {
-
     console.log(`✅ Server running on http://localhost:${port}`);
     console.log("✅ Connected to MongoDB");
-
 });
