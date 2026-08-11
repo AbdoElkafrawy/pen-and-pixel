@@ -1,4 +1,37 @@
 // =======================================================
+//                    DARK MODE TOGGLE
+// =======================================================
+
+const themeToggleBtn = document.getElementById("theme-toggle");
+
+function getSavedTheme() {
+    return localStorage.getItem("theme") || "light";
+}
+
+function applyTheme(theme) {
+    if (theme === "dark") {
+        document.body.classList.add("dark-theme");
+        if (themeToggleBtn) themeToggleBtn.textContent = "☀️";
+    } else {
+        document.body.classList.remove("dark-theme");
+        if (themeToggleBtn) themeToggleBtn.textContent = "🌙";
+    }
+}
+
+// Apply immediately on load
+applyTheme(getSavedTheme());
+
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", () => {
+        const currentTheme = getSavedTheme();
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        localStorage.setItem("theme", newTheme);
+        applyTheme(newTheme);
+    });
+}
+
+
+// =======================================================
 //              CHARACTER COUNTERS (forms)
 // =======================================================
 

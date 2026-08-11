@@ -48,6 +48,26 @@ header h1 {
     gap: 15px;
 }
 
+.theme-toggle-btn {
+    background: #1f2937;
+    border: 2px solid #374151;
+    color: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.1);
+    border-color: #2563eb;
+}
+
 .new-post-btn {
     text-decoration: none;
     background: #2563eb;
@@ -765,3 +785,120 @@ header h1 {
         width: 100%;
     }
 }
+
+
+/* =======================================================
+               13. DARK THEME OVERRIDES
+   ======================================================= */
+
+body.dark-theme {
+    background: #0f172a;
+    color: #f8fafc;
+}
+
+body.dark-theme header {
+    background: #020617;
+}
+
+body.dark-theme .hero h2,
+body.dark-theme .posts-heading,
+body.dark-theme .form-heading,
+body.dark-theme .form-group label,
+body.dark-theme .comments-section h3,
+body.dark-theme .add-comment-form h4 {
+    color: #f8fafc;
+}
+
+body.dark-theme .hero p,
+body.dark-theme .post-meta,
+body.dark-theme .no-comments,
+body.dark-theme .counter {
+    color: #94a3b8;
+}
+
+body.dark-theme .post-card,
+body.dark-theme .form-container,
+body.dark-theme .quote-card,
+body.dark-theme .empty-message,
+body.dark-theme .add-comment-form {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .post-header h2 a,
+body.dark-theme .read-more {
+    color: #60a5fa;
+}
+
+body.dark-theme .post-body,
+body.dark-theme .quote-card blockquote,
+body.dark-theme .comment-text {
+    color: #cbd5e1;
+}
+
+body.dark-theme .quote-author {
+    color: #94a3b8;
+}
+
+body.dark-theme .post-footer,
+body.dark-theme .post-meta.single,
+body.dark-theme .single-post-footer,
+body.dark-theme .comments-section {
+    border-color: #334155;
+}
+
+body.dark-theme .comment-card {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+body.dark-theme .comment-author {
+    color: #f8fafc;
+}
+
+body.dark-theme .comment-date {
+    color: #64748b;
+}
+
+body.dark-theme .form-group input,
+body.dark-theme .form-group textarea,
+body.dark-theme .add-comment-form textarea {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+body.dark-theme .form-group input:focus,
+body.dark-theme .form-group textarea:focus {
+    border-color: #3b82f6;
+    background: #0f172a;
+}
+
+body.dark-theme .like-btn,
+body.dark-theme .comments-badge {
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.dark-theme .comments-badge:hover {
+    border-color: #60a5fa;
+    color: #60a5fa;
+}
+
+body.dark-theme .like-btn:hover:not(:disabled) {
+    border-color: #f87171;
+    color: #f87171;
+}
+
+body.dark-theme .like-btn.liked {
+    background: #450a0a;
+    border-color: #ef4444;
+    color: #fca5a5;
+}
+
+body.dark-theme .theme-toggle-btn {
+    background: #334155;
+    border-color: #475569;
+}
+
