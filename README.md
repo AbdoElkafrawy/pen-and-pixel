@@ -1,8 +1,12 @@
 # 🖋️ Pen & Pixel
 
-A modern, feature-rich full-stack blogging platform built with **Node.js**, **Express.js**, **MongoDB**, **Mongoose**, and **EJS**.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-pen--and--pixel.onrender.com-brightgreen?style=for-the-badge&logo=render)](https://pen-and-pixel.onrender.com)
 
-Pen & Pixel enables authors to publish and manage blog posts with cover images while providing readers with interactive capabilities like **instant post likes**, **comments**, **search**, **estimated reading time**, **live weather forecasts**, and **inspirational daily quotes**.
+🔗 **Live Production Site**: [https://pen-and-pixel.onrender.com](https://pen-and-pixel.onrender.com)
+
+A modern, feature-rich full-stack blogging platform built with **Node.js**, **Express.js**, **MongoDB**, **Mongoose**, **Cloudinary**, and **EJS**.
+
+Pen & Pixel enables authors to publish and manage blog posts with cover images while providing readers with interactive capabilities like **instant post likes**, **comments**, **dark mode**, **search**, **estimated reading time**, **live weather forecasts**, and **inspirational daily quotes**.
 
 ---
 
