@@ -10,15 +10,15 @@ Pen & Pixel enables authors to publish and manage blog posts with cover images w
 
 ---
 
-## ✨ Features Breakdown
+##  Features Breakdown
 
-### 📝 Blog Post Management (CRUD)
+###  Blog Post Management (CRUD)
 - **Create**: Add new posts with titles, rich content, and cover image uploads.
 - **Read**: View the latest posts feed sorted chronologically, or read individual post pages.
 - **Edit**: Update existing posts and replace cover images with automatic old-image cleanup.
 - **Delete**: Remove posts and automatically delete associated uploaded image files from disk.
 
-### 🔒 Admin Authentication
+###  Admin Authentication
 - **Secure Sessions**: Protected routes (`/new`, `/posts/:id/edit`, `/posts/:id/delete`, comment deletion) require an active admin session using `express-session`.
 - **Password Hashing**: Uses `bcryptjs` with 10 salt rounds to securely hash and verify admin credentials.
 - **UI Guarding**: Admin-only controls (`+ New Post`, `Edit`, `Delete`) automatically hide from public visitors.
@@ -52,7 +52,7 @@ Pen & Pixel enables authors to publish and manage blog posts with cover images w
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 - **Backend**: Node.js, Express.js (v5), MongoDB, Mongoose ODM
 - **Authentication**: `express-session`, `bcryptjs`
@@ -95,7 +95,7 @@ pen-and-pixel/
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v18 or higher recommended)
@@ -145,7 +145,7 @@ pen-and-pixel/
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
 **Abdellatif Elkafrawy**
 - GitHub: [@AbdoElkafrawy](https://github.com/AbdoElkafrawy)
