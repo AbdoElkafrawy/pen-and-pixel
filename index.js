@@ -139,7 +139,7 @@ const upload = multer({
         }
     },
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
+        fileSize: 15 * 1024 * 1024 // 15MB limit
     }
 });
 
@@ -582,6 +582,20 @@ app.post("/posts/:id/comments/:commentId/delete", requireAuth, async (req, res) 
         console.error("Delete Comment Error:", error);
         res.status(500).send("Error deleting comment");
     }
+});
+
+
+// Express Error Handling Middleware (catches Multer file size / format errors gracefully)
+app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+            return res.status(400).send("File size too large! Maximum image upload size is 15MB.");
+        }
+        return res.status(400).send(`File Upload Error: ${err.message}`);
+    } else if (err) {
+        return res.status(400).send(err.message || "An unexpected error occurred.");
+    }
+    next();
 });
 
 
