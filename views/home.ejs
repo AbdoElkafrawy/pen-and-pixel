@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <%- include("partials/head", { title: "🖋️ Pen & Pixel — Modern Blog" }) %>
+    <%- include("partials/head", { title: "🖋️ Pen & Pixel — Modern Magazine Blog" }) %>
 </head>
 <body>
 
@@ -9,13 +9,25 @@
 
     <main>
         <!-- =======================================================
-                            HERO SECTION
+                            HERO BANNER
         ======================================================= -->
         <section class="hero">
-            <h2>Every great creation begins with a single thought.</h2>
-            <p>Write yours.</p>
+            <div class="hero-card-box">
+                <span class="hero-badge">✨ Welcome to Pen &amp; Pixel</span>
+                <h2>Every great creation begins with a single thought.</h2>
+                <p>Write yours.</p>
 
-            <!-- Weather Widget (IP Geolocation + Open-Meteo API) -->
+                <% if (isAdmin) { %>
+                    <a href="/new" class="hero-btn">Start Writing</a>
+                <% } %>
+            </div>
+        </section>
+
+
+        <!-- =======================================================
+                 SIDE-BY-SIDE WIDGETS (Weather & Quote)
+        ======================================================= -->
+        <section class="widgets-bar">
             <% if (weather) { %>
                 <div class="weather-card">
                     <h3>📍 <%= weather.city %></h3>
@@ -27,38 +39,29 @@
                         Feels like <strong><%= Math.round(weather.feelsLike) %>°C</strong>
                     </p>
                 </div>
-            <% } else { %>
-                <div class="weather-card">
-                    <p>Weather is currently unavailable.</p>
-                </div>
             <% } %>
 
-            <% if (isAdmin) { %>
-                <a href="/new" class="hero-btn">Start Writing</a>
-            <% } %>
-
-            <!-- Quote of the Day Widget (API Ninjas) -->
             <% if (quote) { %>
-                <section class="quote-card">
-                    <h2>💬 Quote of the Day</h2>
+                <div class="quote-card">
+                    <h3>💬 Quote of the Day</h3>
                     <blockquote>"<%= quote.text %>"</blockquote>
                     <p class="quote-author">— <%= quote.author %></p>
-                </section>
+                </div>
             <% } %>
         </section>
 
 
         <!-- =======================================================
-                            POSTS FEED
+                       MAGAZINE POSTS FEED
         ======================================================= -->
-        <section class="posts">
+        <section class="posts-magazine">
 
             <% if (search) { %>
                 <h2 class="posts-heading">
                     Search Results for "<%= search %>" — <%= posts.length %> <%= posts.length === 1 ? 'post' : 'posts' %>
                 </h2>
             <% } else { %>
-                <h2 class="posts-heading">Latest Posts</h2>
+                <h2 class="posts-heading">🔥 Top Stories &amp; Latest Posts</h2>
             <% } %>
             
             <% if (posts.length === 0) { %>
@@ -69,63 +72,127 @@
                 <% } %>
             <% } %>
 
-            <!-- Loop over all blog posts -->
-            <% posts.forEach((post) => { %>
-                <article class="post-card">
-                    <div class="post-header">
-                        <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
-                        <p class="post-meta">
-                            📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
-                        </p>
-                    </div>
-
-                    <% if (post.image) { %>
-                        <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image">
+            <!-- When not searching and we have posts, render the FIRST post as a Featured Hero Card -->
+            <% if (!search && posts.length > 0) { %>
+                <% const featuredPost = posts[0]; %>
+                <article class="post-card featured-hero-card">
+                    <div class="featured-badge">⭐ Featured Story</div>
+                    
+                    <% if (featuredPost.image) { %>
+                        <img src="<%= featuredPost.image %>" alt="<%= featuredPost.title %>" class="post-image featured-image">
                     <% } %>
 
-                    <div class="post-body">
-                        <p>
-                            <% if (post.content.length > 200) { %>
-                                <%= post.content.substring(0, 200) %>...
-                            <% } else { %>
-                                <%= post.content %>
-                            <% } %>
-                        </p>
-                    </div>
+                    <div class="featured-content">
+                        <div class="post-header">
+                            <h2><a href="/posts/<%= featuredPost.id %>"><%= featuredPost.title %></a></h2>
+                            <p class="post-meta">
+                                📅 <%= featuredPost.createdAtDisplay || featuredPost.createdAt %> • ⏱️ <%= featuredPost.readingTime %> min read
+                            </p>
+                        </div>
 
-                    <div class="post-footer">
-                        <a href="/posts/<%= post.id %>" class="read-more">Read More &rarr;</a>
+                        <div class="post-body">
+                            <p>
+                                <% if (featuredPost.content.length > 280) { %>
+                                    <%= featuredPost.content.substring(0, 280) %>...
+                                <% } else { %>
+                                    <%= featuredPost.content %>
+                                <% } %>
+                            </p>
+                        </div>
 
-                        <div class="post-footer-right">
-                            <!-- Clickable comment badge -->
-                            <a href="/posts/<%= post.id %>#comments" class="comments-badge" title="View comments">
-                                💬 <span class="comment-count"><%= (post.comments || []).length %></span>
-                            </a>
+                        <div class="post-footer">
+                            <a href="/posts/<%= featuredPost.id %>" class="read-more">Read Full Story &rarr;</a>
 
-                            <!-- Interactive Like/Unlike button -->
-                            <button
-                                class="like-btn"
-                                data-post-id="<%= post.id %>"
-                                aria-label="Like this post"
-                            >
-                                ❤️ <span class="like-count"><%= post.likes || 0 %></span>
-                            </button>
+                            <div class="post-footer-right">
+                                <a href="/posts/<%= featuredPost.id %>#comments" class="comments-badge" title="View comments">
+                                    💬 <span class="comment-count"><%= (featuredPost.comments || []).length %></span>
+                                </a>
 
-                            <!-- Admin Controls -->
-                            <% if (isAdmin) { %>
-                                <div class="post-actions">
-                                    <a class="edit-btn" href="/posts/<%= post.id %>/edit">Edit</a>
-                                    <form action="/posts/<%= post.id %>/delete" method="POST">
-                                        <button class="delete-btn" onclick="return confirm('Delete this post?')" type="submit">
-                                            Delete
-                                        </button>
-                                    </form>
-                                </div>
-                            <% } %>
+                                <button
+                                    class="like-btn"
+                                    data-post-id="<%= featuredPost.id %>"
+                                    aria-label="Like this post"
+                                >
+                                    ❤️ <span class="like-count"><%= featuredPost.likes || 0 %></span>
+                                </button>
+
+                                <% if (isAdmin) { %>
+                                    <div class="post-actions">
+                                        <a class="edit-btn" href="/posts/<%= featuredPost.id %>/edit">Edit</a>
+                                        <form action="/posts/<%= featuredPost.id %>/delete" method="POST">
+                                            <button class="delete-btn" onclick="return confirm('Delete this post?')" type="submit">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                <% } %>
+                            </div>
                         </div>
                     </div>
                 </article>
-            <% }); %>
+            <% } %>
+
+
+            <!-- Render remaining posts (or all search results) in a 2-Column Grid -->
+            <% const gridPosts = (!search && posts.length > 0) ? posts.slice(1) : posts; %>
+
+            <% if (gridPosts.length > 0) { %>
+                <div class="posts-grid">
+                    <% gridPosts.forEach((post) => { %>
+                        <article class="post-card grid-card">
+                            <% if (post.image) { %>
+                                <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image grid-image">
+                            <% } %>
+
+                            <div class="post-header">
+                                <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
+                                <p class="post-meta">
+                                    📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
+                                </p>
+                            </div>
+
+                            <div class="post-body">
+                                <p>
+                                    <% if (post.content.length > 150) { %>
+                                        <%= post.content.substring(0, 150) %>...
+                                    <% } else { %>
+                                        <%= post.content %>
+                                    <% } %>
+                                </p>
+                            </div>
+
+                            <div class="post-footer">
+                                <a href="/posts/<%= post.id %>" class="read-more">Read More &rarr;</a>
+
+                                <div class="post-footer-right">
+                                    <a href="/posts/<%= post.id %>#comments" class="comments-badge" title="View comments">
+                                        💬 <span class="comment-count"><%= (post.comments || []).length %></span>
+                                    </a>
+
+                                    <button
+                                        class="like-btn"
+                                        data-post-id="<%= post.id %>"
+                                        aria-label="Like this post"
+                                    >
+                                        ❤️ <span class="like-count"><%= post.likes || 0 %></span>
+                                    </button>
+
+                                    <% if (isAdmin) { %>
+                                        <div class="post-actions">
+                                            <a class="edit-btn" href="/posts/<%= post.id %>/edit">Edit</a>
+                                            <form action="/posts/<%= post.id %>/delete" method="POST">
+                                                <button class="delete-btn" onclick="return confirm('Delete this post?')" type="submit">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </article>
+                    <% }); %>
+                </div>
+            <% } %>
 
         </section>
     </main>
