@@ -65,7 +65,7 @@ const weatherCodes = {
 await mongoose.connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/blog");
 
 // Hash the admin password once on startup using 10 salt rounds
-const ADMIN_HASH = await bcrypt.hash(process.env.ADMIN_PASSWORD || "penandpixel123", 10);
+const ADMIN_HASH = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
 
 // Defines the MongoDB schema for blog posts
 const postSchema = new mongoose.Schema({
@@ -201,7 +201,7 @@ app.use(express.json());
 
 // Session middleware configuration
 app.use(session({
-    secret: process.env.SESSION_SECRET || "fallback_secret_key",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
