@@ -3,3 +3,5 @@ node_modules/
 .DS_Store
 public/images/*
 !public/images/.gitkeep
+data/
+seed_posts.js
