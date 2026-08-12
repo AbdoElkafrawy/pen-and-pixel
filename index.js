@@ -510,6 +510,36 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80",
                 likes: 33,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 11)
+            },
+
+            // --- FEATURED & POPULAR TOPICS (4 posts) ---
+            {
+                title: "Humanoid Robotics Beyond the Lab: How Bipedal Androids Are Entering Homes and Factories",
+                content: "Advanced humanoid robotics has made a giant leap from experimental prototypes to real-world deployment. Powered by embodied artificial intelligence, modern bipedal androids can navigate complex physical environments, assist in automotive manufacturing, and perform intricate household chores. Robotics engineers predict that over 10 million humanoid assistants will be active worldwide by 2030, marking the dawn of a new era in human-machine collaboration.",
+                image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
+                likes: 42,
+                createdAt: new Date(Date.now() - 1000 * 60 * 30) // 30 mins ago
+            },
+            {
+                title: "The Multiverse Hypothesis: Quantum Physics and the Search for Parallel Universes",
+                content: "Is our universe just one among an infinite ensemble of realities? Theoretical physicists and cosmologists are exploring quantum entanglement and cosmic inflation models that suggest the existence of parallel universes. Recent quantum superposition experiments at particle accelerators have provided mathematical frameworks hinting that alternate realities may branch continuously at the quantum level, challenging fundamental assumptions about time, space, and existence.",
+                image: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1200&q=80",
+                likes: 56,
+                createdAt: new Date(Date.now() - 1000 * 60 * 45) // 45 mins ago
+            },
+            {
+                title: "The Resilience of Crypto: The Volatile Fall and Historic Rise of Bitcoin",
+                content: "From dramatic market pullbacks to surging institutional adoption, Bitcoin has experienced one of the most remarkable financial trajectories in modern economic history. Following regulatory shifts, sovereign reserve integration, and global spot ETF inflows, decentralized digital currency has solidified its role as digital gold. Market analysts examine how technological upgrades, halving cycles, and macroeconomic hedges continue to drive the evolution of global monetary systems.",
+                image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+                likes: 37,
+                createdAt: new Date(Date.now() - 1000 * 60 * 90) // 1.5 hrs ago
+            },
+            {
+                title: "Wealth Concentration & Global Power: Unpacking the 1% Who Shape the World Economy",
+                content: "Global wealth data reveals an unprecedented concentration of economic influence, where the top 1% of individuals control over 45% of total global net worth. Through multinational conglomerates, sovereign wealth funds, and technology monopolies, key financial decisions impact global markets, political campaigns, and resource allocation. Socioeconomic experts analyze the systemic mechanics behind capital accumulation and the growing international call for tax reform and equitable economic policies.",
+                image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+                likes: 49,
+                createdAt: new Date(Date.now() - 1000 * 60 * 120) // 2 hrs ago
             }
         ];
 
