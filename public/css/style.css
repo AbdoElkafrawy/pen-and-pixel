@@ -417,10 +417,10 @@ header h1 {
     justify-content: center;
 }
 
-/* 2-Column Magazine Grid */
+/* 3-Column Magazine Grid */
 .posts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 25px;
 }
 
@@ -1080,7 +1080,13 @@ body.dark-theme .weather-card strong {
     color: #ffd166;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1150px) {
+    .posts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
     .featured-hero-card {
         grid-template-columns: 1fr;
     }
