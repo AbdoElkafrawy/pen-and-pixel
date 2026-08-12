@@ -441,6 +441,75 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 image: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=1200&q=80",
                 likes: 27,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48)
+            },
+
+            // --- POLITICS WORLDWIDE (3 posts) ---
+            {
+                title: "Global Climate Summit 2026: 190 Nations Sign Historic Carbon Neutrality Treaty",
+                content: "Representatives from 190 countries gathered in Geneva to ratify a landmark international climate accord. The binding treaty establishes mandatory carbon reduction targets, international carbon credit trading standards, and a $100 billion annual fund supporting green infrastructure in developing economies. Diplomatic observers hail the treaty as the most comprehensive global environmental agreement since the Paris Accord.",
+                image: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80",
+                likes: 19,
+                createdAt: new Date(Date.now() - 1000 * 60 * 60 * 1)
+            },
+            {
+                title: "European Union Passes Comprehensive Digital Rights & AI Sovereignty Act",
+                content: "The European Parliament has officially enacted the Digital Rights and AI Sovereignty Act, introducing strict regulations governing automated algorithmic decision-making, synthetic media watermarking, and cross-border cloud data storage. The legislation mandates transparent source audits for high-risk AI deployments while protecting user privacy rights across all 27 member states.",
+                image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1200&q=80",
+                likes: 24,
+                createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3)
+            },
+            {
+                title: "Pacific Rim Economic Pact Expands Trade Framework Across 14 Asian Economies",
+                content: "Trade ministers across 14 Pacific Rim nations have signed an expanded multilateral trade agreement designed to eliminate digital tariffs, streamline cross-border semiconductor supply chains, and establish unified cyber-security standards. Economists predict the historic agreement will boost intra-regional trade volume by 28% over the next decade.",
+                image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+                likes: 15,
+                createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6)
+            },
+
+            // --- SCIENCE (3 posts) ---
+            {
+                title: "Deep Space Observatory Detects Water Vapor in Habitable Exoplanet Atmosphere",
+                content: "Astronomers utilizing next-generation space telescopes have detected significant atmospheric water vapor and organic carbon molecules surrounding Exoplanet K2-18b, situated 120 light-years away in its star's habitable zone. Spectral analysis indicates the presence of liquid oceans and complex clouds, providing humanity's strongest evidence to date of a potentially habitable ocean world beyond our solar system.",
+                image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+                likes: 38,
+                createdAt: new Date(Date.now() - 1000 * 60 * 60 * 4)
+            },
+            {
+                title: "Fusion Energy Breakthrough: Reactor Maintains Net Positive Output for 48 Hours",
+                content: "Physicists at the International Thermonuclear Experimental Reactor have achieved a monumental landmark in clean energy, sustaining a controlled nuclear fusion reaction with net positive energy gain continuously for 48 hours. By achieving plasma temperatures exceeding 150 million degrees Celsius, the experiment confirms the commercial viability of fusion energy as a virtually limitless, zero-carbon power source.",
+                image: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=1200&q=80",
+                likes: 31,
+                createdAt: new Date(Date.now() - 1000 * 60 * 60 * 8)
+            },
+            {
+                title: "Neuroscientists Map Complete Human Brain Neural Synapse Network",
+                content: "A international coalition of neuroscientists and bio-engineers has published the first complete 3D synaptic map of human brain neural pathways. Utilizing ultra-high-resolution electron microscopy and AI pattern reconstruction, the landmark dataset maps over 86 billion neurons and 100 trillion synaptic connections, unlocking revolutionary avenues for treating Alzheimer's, Parkinson's, and neurological disorders.",
+                image: "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=1200&q=80",
+                likes: 45,
+                createdAt: new Date(Date.now() - 1000 * 60 * 60 * 10)
+            },
+
+            // --- CINEMA LATEST NEWS (3 posts) ---
+            {
+                title: "Cannes Film Festival Unveils Palme d'Or Winners & Future of Independent Cinema",
+                content: "The 79th Cannes Film Festival concluded with visionary international directors taking home top honors. The coveted Palme d'Or was awarded to an extraordinary sci-fi allegory exploring human memory and artificial consciousness, praised by critics for its groundbreaking practical cinematography and hypnotic score. Film industry executives highlighted a major resurgence in theatrical attendance for bold independent cinema.",
+                image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
+                likes: 27,
+                createdAt: new Date(Date.now() - 1000 * 60 * 60 * 7)
+            },
+            {
+                title: "Revolutionary Virtual Production Stages Transform Hollywood Visual Effects",
+                content: "Hollywood studios are inaugurating next-generation 360-degree LED virtual production stages powered by real-time photorealistic graphics engines. Allowing directors to shoot scenes across virtual desert dunes, futuristic cyber-cities, and deep underwater environments without leaving the soundstage, virtual production has dramatically lowered movie production costs while enabling unprecedented creative visual freedom.",
+                image: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1200&q=80",
+                likes: 21,
+                createdAt: new Date(Date.now() - 1000 * 60 * 60 * 9)
+            },
+            {
+                title: "Classic Sci-Fi Masterpiece Sequel Shatters International Box Office Records",
+                content: "The highly anticipated sci-fi epic sequel has shattered global opening weekend box office records, earning over $450 million worldwide. Audiences and critics alike are praising the film's immersive 70mm IMAX presentation, groundbreaking practical animatronics, and emotionally resonant storytelling. Box office analysts note that large-format Premium Large Format (PLF) screenings drove over 70% of opening weekend ticket sales.",
+                image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80",
+                likes: 33,
+                createdAt: new Date(Date.now() - 1000 * 60 * 60 * 11)
             }
         ];
 
