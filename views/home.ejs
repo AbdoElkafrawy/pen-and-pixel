@@ -56,10 +56,28 @@
         ======================================================= -->
         <section class="posts-magazine">
 
+            <!-- Category Filter Pills Navigation Bar -->
+            <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+                <nav class="category-nav-bar" aria-label="Blog Categories">
+                    <div class="category-pills">
+                        <% categories.forEach((cat) => { %>
+                            <a 
+                                href="/?<%= search ? 'search=' + encodeURIComponent(search) + '&' : '' %>category=<%= encodeURIComponent(cat) %>" 
+                                class="category-pill <%= (currentCategory === cat) ? 'active' : '' %>"
+                            >
+                                <%= cat === 'All' ? '🌐 All' : (cat === 'Tech' ? '💻 Tech' : (cat === 'Politics' ? '🏛️ Politics' : (cat === 'Science' ? '🔬 Science' : (cat === 'Cinema' ? '🎬 Cinema' : (cat === 'Art' ? '🎨 Art' : (cat === 'Crypto' ? '🪙 Crypto' : (cat === 'Society' ? '🏙️ Society' : '🏷️ ' + cat))))))) %>
+                            </a>
+                        <% }); %>
+                    </div>
+                </nav>
+            <% } %>
+
             <% if (search) { %>
                 <h2 class="posts-heading">
                     Search Results for "<%= search %>" — <%= posts.length %> <%= posts.length === 1 ? 'post' : 'posts' %>
                 </h2>
+            <% } else if (currentCategory && currentCategory !== 'All') { %>
+                <h2 class="posts-heading">Showing Category: "<%= currentCategory %>" — <%= posts.length %> <%= posts.length === 1 ? 'post' : 'posts' %></h2>
             <% } else { %>
                 <h2 class="posts-heading">🔥 Top Stories &amp; Latest Posts</h2>
             <% } %>
@@ -84,6 +102,7 @@
 
                     <div class="featured-content">
                         <div class="post-header">
+                            <span class="card-category-tag"><%= featuredPost.category || 'General' %></span>
                             <h2><a href="/posts/<%= featuredPost.id %>"><%= featuredPost.title %></a></h2>
                             <p class="post-meta">
                                 📅 <%= featuredPost.createdAtDisplay || featuredPost.createdAt %> • ⏱️ <%= featuredPost.readingTime %> min read
@@ -145,6 +164,7 @@
                             <% } %>
 
                             <div class="post-header">
+                                <span class="card-category-tag"><%= post.category || 'General' %></span>
                                 <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
                                 <p class="post-meta">
                                     📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read

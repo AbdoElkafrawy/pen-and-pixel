@@ -344,6 +344,61 @@ header h1 {
             6. MAGAZINE GRID FEED & FEATURED CARD
    ======================================================= */
 
+/* Category Navigation Bar & Pills */
+.category-nav-bar {
+    margin-bottom: 25px;
+}
+
+.category-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.category-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: white;
+    color: #475569;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 30px;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s ease;
+}
+
+.category-pill:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+    border-color: #94a3b8;
+    transform: translateY(-2px);
+}
+
+.category-pill.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.card-category-tag {
+    display: inline-block;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .posts-heading {
     margin-bottom: 25px;
     color: #0f172a;
@@ -1078,6 +1133,29 @@ body.dark-theme .weather-temp {
 
 body.dark-theme .weather-card strong {
     color: #ffd166;
+}
+
+body.dark-theme .category-pill {
+    background: #1e293b;
+    color: #cbd5e1;
+    border-color: #334155;
+}
+
+body.dark-theme .category-pill:hover {
+    background: #334155;
+    color: white;
+}
+
+body.dark-theme .category-pill.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+body.dark-theme .card-category-tag {
+    background: #1e3a8a;
+    color: #93c5fd;
 }
 
 @media (max-width: 1150px) {

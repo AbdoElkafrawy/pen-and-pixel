@@ -85,6 +85,12 @@ const postSchema = new mongoose.Schema({
         required: false
     },
 
+    category: {
+        type: String,
+        default: "General",
+        trim: true
+    },
+
     createdAt: {
         type: Date,
         required: true,
@@ -230,19 +236,27 @@ const WEATHER_CACHE_DURATION = 60 * 60 * 1000;
 app.get("/", async (req, res) => {
     try {
         const search = req.query.search;
-        let posts;
+        const selectedCategory = req.query.category;
 
-        // Execute regex search if query provided, else fetch all posts
+        const filter = {};
+
         if (search) {
-            posts = await Post.find({
-                $or: [
-                    { title: { $regex: search, $options: "i" } },
-                    { content: { $regex: search, $options: "i" } }
-                ]
-            }).sort({ createdAt: -1 });
-        } else {
-            posts = await Post.find().sort({ createdAt: -1 });
+            filter.$or = [
+                { title: { $regex: search, $options: "i" } },
+                { content: { $regex: search, $options: "i" } }
+            ];
         }
+
+        if (selectedCategory && selectedCategory !== "All") {
+            filter.category = { $regex: `^${selectedCategory}$`, $options: "i" };
+        }
+
+        const posts = await Post.find(filter).sort({ createdAt: -1 });
+
+        // Get list of distinct categories from database, plus predefined defaults
+        const dbCategories = await Post.distinct("category");
+        const defaultCategories = ["All", "Tech", "Politics", "Science", "Cinema", "Art", "Crypto", "Society"];
+        const combinedCategories = Array.from(new Set([...defaultCategories, ...dbCategories.filter(Boolean)]));
 
         // Attach computed fields: readingTime and formatted display date
         const postsWithDetails = posts.map(post => {
@@ -332,7 +346,9 @@ app.get("/", async (req, res) => {
             posts: postsWithDetails,
             weather,
             quote,
-            search
+            search,
+            currentCategory: selectedCategory || "All",
+            categories: combinedCategories
         });
 
     } catch (error) {
@@ -384,6 +400,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Quantum Advantage Achieved: How 2026 Processors Revolutionize Computing",
                 content: "The tech industry has officially crossed a monumental threshold. Next-generation quantum processors have achieved true commercial quantum advantage, solving complex molecular simulation calculations in seconds that traditional supercomputers would take thousands of years to compute. Major tech leaders and research labs are accelerating deployments in cryptography, climate modeling, and material science. As quantum cloud computing becomes accessible to developers worldwide, software engineering is entering a dramatic paradigm shift where probabilistic algorithms and quantum logic gates are becoming mainstream skills.",
                 image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1200&q=80",
+                category: "Tech",
                 likes: 14,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2)
             },
@@ -391,6 +408,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Autonomous AI Agents Replace Passive Chatbots Across Global Enterprises",
                 content: "The era of simple conversational AI chatbots is rapidly giving way to autonomous action-oriented AI agents. Unlike traditional language models that merely suggest text responses, modern AI agents possess tool-use capabilities, allowing them to debug code, execute cloud deployments, manage supply chains, and automate complex multi-step business workflows independently. Industry analysts highlight that over 65% of Fortune 500 enterprises have integrated autonomous agentic workflows into their core engineering and operational pipelines this year.",
                 image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
+                category: "Tech",
                 likes: 22,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5)
             },
@@ -400,6 +418,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "2026 US Midterms: Bipartisan AI & Tech Governance Takes Center Stage",
                 content: "As political campaigns intensify across the United States for the 2026 midterm elections, technology policy and artificial intelligence regulation have emerged as primary bipartisan priorities. Lawmakers from both major parties are introducing federal frameworks aimed at curbing deepfake election content, protecting consumer data privacy, and setting safety standards for foundational AI models. Debates are focusing on balancing consumer protection with American technological competitiveness in the global economy.",
                 image: "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&w=1200&q=80",
+                category: "Politics",
                 likes: 9,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 12)
             },
@@ -407,6 +426,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Federal Infrastructure Grants Drive Modern Clean Energy Grid Expansion",
                 content: "State governors and federal officials across the United States have announced the allocation of billions in federal infrastructure funding dedicated to modernizing the national power grid. The initiatives prioritize integrating renewable solar and wind energy, expanding high-voltage transmission corridors, and deploying grid-scale battery storage infrastructure. Analysts note that these infrastructure investments are projected to lower consumer utility costs while strengthening grid resilience against extreme weather events.",
                 image: "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1200&q=80",
+                category: "Politics",
                 likes: 11,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 18)
             },
@@ -416,6 +436,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "CRISPR 2.0 In-Vivo Gene Editing Receives Landmark Global Approvals",
                 content: "Medical science has achieved a historic milestone as regulatory health agencies worldwide granted full approvals for advanced in-vivo CRISPR gene editing therapies. Unlike first-generation treatments that required extracting cells for external manipulation, CRISPR 2.0 therapies are administered via single targeted infusions directly into the patient's bloodstream. Early clinical results demonstrate complete genetic correction for hereditary blindness, sickle cell disease, and specific metabolic liver conditions without adverse side effects.",
                 image: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=1200&q=80",
+                category: "Science",
                 likes: 35,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24)
             },
@@ -423,6 +444,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Universal Personalized Cancer mRNA Vaccines Enter Phase 3 Trials",
                 content: "Oncology is undergoing a revolutionary transformation as universal personalized mRNA cancer vaccines enter Phase 3 international clinical trials. By sequencing a patient's tumor genome, medical labs produce a custom vaccine within 48 hours that trains the body's immune T-cells to identify and eliminate microscopic cancer cells. Clinical trial data indicates a dramatic reduction in relapse rates for melanoma, pancreatic, and non-small cell lung cancers, signaling a new frontier in precision medicine.",
                 image: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1200&q=80",
+                category: "Science",
                 likes: 41,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 30)
             },
@@ -432,6 +454,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Museums Adopt Blockchain Digital Provenance for Classical Masterpieces",
                 content: "Leading international art institutions, including the Louvre, the Met, and Tate Modern, have unveiled a unified digital provenance network. Utilizing decentralized cryptographic verification, art curators and collectors can now track the century-spanning ownership history, restoration logs, and authenticity records of physical paintings and sculptures. The initiative aims to combat art forgery, streamline international museum loans, and bridge traditional fine art with digital archival preservation.",
                 image: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=80",
+                category: "Art",
                 likes: 18,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 36)
             },
@@ -439,6 +462,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Biophilic Living Eco-Art Installations Transform Urban Architecture",
                 content: "The contemporary art world is witnessing a dramatic surge in biophilic living installations — large-scale architectural artworks that incorporate living flora, bioluminescent algae, and responsive environmental sensors into urban spaces. Exhibited across major cultural capitals, these living installations change colors and textures in response to air quality, ambient sound, and climate patterns, blurring the boundary between environmental science, urban design, and fine art.",
                 image: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=1200&q=80",
+                category: "Art",
                 likes: 27,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48)
             },
@@ -448,6 +472,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Global Climate Summit 2026: 190 Nations Sign Historic Carbon Neutrality Treaty",
                 content: "Representatives from 190 countries gathered in Geneva to ratify a landmark international climate accord. The binding treaty establishes mandatory carbon reduction targets, international carbon credit trading standards, and a $100 billion annual fund supporting green infrastructure in developing economies. Diplomatic observers hail the treaty as the most comprehensive global environmental agreement since the Paris Accord.",
                 image: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80",
+                category: "Politics",
                 likes: 19,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 1)
             },
@@ -455,6 +480,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "European Union Passes Comprehensive Digital Rights & AI Sovereignty Act",
                 content: "The European Parliament has officially enacted the Digital Rights and AI Sovereignty Act, introducing strict regulations governing automated algorithmic decision-making, synthetic media watermarking, and cross-border cloud data storage. The legislation mandates transparent source audits for high-risk AI deployments while protecting user privacy rights across all 27 member states.",
                 image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1200&q=80",
+                category: "Politics",
                 likes: 24,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3)
             },
@@ -462,6 +488,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Pacific Rim Economic Pact Expands Trade Framework Across 14 Asian Economies",
                 content: "Trade ministers across 14 Pacific Rim nations have signed an expanded multilateral trade agreement designed to eliminate digital tariffs, streamline cross-border semiconductor supply chains, and establish unified cyber-security standards. Economists predict the historic agreement will boost intra-regional trade volume by 28% over the next decade.",
                 image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+                category: "Politics",
                 likes: 15,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6)
             },
@@ -471,6 +498,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Deep Space Observatory Detects Water Vapor in Habitable Exoplanet Atmosphere",
                 content: "Astronomers utilizing next-generation space telescopes have detected significant atmospheric water vapor and organic carbon molecules surrounding Exoplanet K2-18b, situated 120 light-years away in its star's habitable zone. Spectral analysis indicates the presence of liquid oceans and complex clouds, providing humanity's strongest evidence to date of a potentially habitable ocean world beyond our solar system.",
                 image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+                category: "Science",
                 likes: 38,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 4)
             },
@@ -478,6 +506,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Fusion Energy Breakthrough: Reactor Maintains Net Positive Output for 48 Hours",
                 content: "Physicists at the International Thermonuclear Experimental Reactor have achieved a monumental landmark in clean energy, sustaining a controlled nuclear fusion reaction with net positive energy gain continuously for 48 hours. By achieving plasma temperatures exceeding 150 million degrees Celsius, the experiment confirms the commercial viability of fusion energy as a virtually limitless, zero-carbon power source.",
                 image: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=1200&q=80",
+                category: "Science",
                 likes: 31,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 8)
             },
@@ -485,6 +514,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Neuroscientists Map Complete Human Brain Neural Synapse Network",
                 content: "A international coalition of neuroscientists and bio-engineers has published the first complete 3D synaptic map of human brain neural pathways. Utilizing ultra-high-resolution electron microscopy and AI pattern reconstruction, the landmark dataset maps over 86 billion neurons and 100 trillion synaptic connections, unlocking revolutionary avenues for treating Alzheimer's, Parkinson's, and neurological disorders.",
                 image: "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=1200&q=80",
+                category: "Science",
                 likes: 45,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 10)
             },
@@ -494,6 +524,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Cannes Film Festival Unveils Palme d'Or Winners & Future of Independent Cinema",
                 content: "The 79th Cannes Film Festival concluded with visionary international directors taking home top honors. The coveted Palme d'Or was awarded to an extraordinary sci-fi allegory exploring human memory and artificial consciousness, praised by critics for its groundbreaking practical cinematography and hypnotic score. Film industry executives highlighted a major resurgence in theatrical attendance for bold independent cinema.",
                 image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
+                category: "Cinema",
                 likes: 27,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 7)
             },
@@ -501,6 +532,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Revolutionary Virtual Production Stages Transform Hollywood Visual Effects",
                 content: "Hollywood studios are inaugurating next-generation 360-degree LED virtual production stages powered by real-time photorealistic graphics engines. Allowing directors to shoot scenes across virtual desert dunes, futuristic cyber-cities, and deep underwater environments without leaving the soundstage, virtual production has dramatically lowered movie production costs while enabling unprecedented creative visual freedom.",
                 image: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1200&q=80",
+                category: "Cinema",
                 likes: 21,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 9)
             },
@@ -508,6 +540,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Classic Sci-Fi Masterpiece Sequel Shatters International Box Office Records",
                 content: "The highly anticipated sci-fi epic sequel has shattered global opening weekend box office records, earning over $450 million worldwide. Audiences and critics alike are praising the film's immersive 70mm IMAX presentation, groundbreaking practical animatronics, and emotionally resonant storytelling. Box office analysts note that large-format Premium Large Format (PLF) screenings drove over 70% of opening weekend ticket sales.",
                 image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80",
+                category: "Cinema",
                 likes: 33,
                 createdAt: new Date(Date.now() - 1000 * 60 * 60 * 11)
             },
@@ -517,29 +550,33 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
                 title: "Humanoid Robotics Beyond the Lab: How Bipedal Androids Are Entering Homes and Factories",
                 content: "Advanced humanoid robotics has made a giant leap from experimental prototypes to real-world deployment. Powered by embodied artificial intelligence, modern bipedal androids can navigate complex physical environments, assist in automotive manufacturing, and perform intricate household chores. Robotics engineers predict that over 10 million humanoid assistants will be active worldwide by 2030, marking the dawn of a new era in human-machine collaboration.",
                 image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
+                category: "Tech",
                 likes: 42,
-                createdAt: new Date(Date.now() - 1000 * 60 * 30) // 30 mins ago
+                createdAt: new Date(Date.now() - 1000 * 60 * 30)
             },
             {
                 title: "The Multiverse Hypothesis: Quantum Physics and the Search for Parallel Universes",
                 content: "Is our universe just one among an infinite ensemble of realities? Theoretical physicists and cosmologists are exploring quantum entanglement and cosmic inflation models that suggest the existence of parallel universes. Recent quantum superposition experiments at particle accelerators have provided mathematical frameworks hinting that alternate realities may branch continuously at the quantum level, challenging fundamental assumptions about time, space, and existence.",
                 image: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1200&q=80",
+                category: "Science",
                 likes: 56,
-                createdAt: new Date(Date.now() - 1000 * 60 * 45) // 45 mins ago
+                createdAt: new Date(Date.now() - 1000 * 60 * 45)
             },
             {
                 title: "The Resilience of Crypto: The Volatile Fall and Historic Rise of Bitcoin",
                 content: "From dramatic market pullbacks to surging institutional adoption, Bitcoin has experienced one of the most remarkable financial trajectories in modern economic history. Following regulatory shifts, sovereign reserve integration, and global spot ETF inflows, decentralized digital currency has solidified its role as digital gold. Market analysts examine how technological upgrades, halving cycles, and macroeconomic hedges continue to drive the evolution of global monetary systems.",
                 image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+                category: "Crypto",
                 likes: 37,
-                createdAt: new Date(Date.now() - 1000 * 60 * 90) // 1.5 hrs ago
+                createdAt: new Date(Date.now() - 1000 * 60 * 90)
             },
             {
                 title: "Wealth Concentration & Global Power: Unpacking the 1% Who Shape the World Economy",
                 content: "Global wealth data reveals an unprecedented concentration of economic influence, where the top 1% of individuals control over 45% of total global net worth. Through multinational conglomerates, sovereign wealth funds, and technology monopolies, key financial decisions impact global markets, political campaigns, and resource allocation. Socioeconomic experts analyze the systemic mechanics behind capital accumulation and the growing international call for tax reform and equitable economic policies.",
                 image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+                category: "Society",
                 likes: 49,
-                createdAt: new Date(Date.now() - 1000 * 60 * 120) // 2 hrs ago
+                createdAt: new Date(Date.now() - 1000 * 60 * 120)
             }
         ];
 
