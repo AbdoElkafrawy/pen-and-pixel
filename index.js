@@ -120,6 +120,47 @@ const postSchema = new mongoose.Schema({
 // Compile the Post model
 const Post = mongoose.model("Post", postSchema);
 
+// Auto-Categorization Migration Helper for legacy DB documents
+async function autoCategorizePosts() {
+    try {
+        const postsToUpdate = await Post.find({
+            $or: [
+                { category: { $exists: false } },
+                { category: null },
+                { category: "" },
+                { category: "General" }
+            ]
+        });
+
+        for (const post of postsToUpdate) {
+            const t = post.title.toLowerCase();
+            if (/quantum|ai|robotics|computing|microchip|6g|spatial|chatbot|autonomous/i.test(t)) {
+                post.category = "Tech";
+            } else if (/midterm|infrastructure|climate|european|pacific|mineral|housing|political|bipartisan|treaty|sovereignty|government/i.test(t)) {
+                post.category = "Politics";
+            } else if (/crispr|cancer|space|multiverse|webb|synthetic|fusion|neuroscientists|exoplanet|gene|vaccine/i.test(t)) {
+                post.category = "Science";
+            } else if (/cannes|production|sci-fi|imax|sound|cinema|film|hollywood|box office|movie/i.test(t)) {
+                post.category = "Cinema";
+            } else if (/blockchain|provenance|biophilic|sculpture|restoration|mural|masterpiece|art|museum/i.test(t)) {
+                post.category = "Art";
+            } else if (/bitcoin|crypto|layer-2|cbdc|treasury|tokenized|financial/i.test(t)) {
+                post.category = "Crypto";
+            } else if (/1%|wealth|workweek|housing|circular|society|economy|power/i.test(t)) {
+                post.category = "Society";
+            } else {
+                post.category = "Tech";
+            }
+            await post.save();
+        }
+    } catch (err) {
+        console.error("Auto-categorization error:", err);
+    }
+}
+
+// Automatically categorize unassigned legacy posts on startup
+autoCategorizePosts();
+
 
 // =======================================================
 //             4. FILE UPLOAD SETUP (Multer)
@@ -396,10 +437,15 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
     try {
         let seedPosts = [];
         try {
-            const seedModule = await import("./data/seedPosts.js");
+            const seedModule = await import("./seedData.js");
             seedPosts = seedModule.seedPosts || [];
         } catch (e) {
-            console.log("No local seedPosts file found.");
+            try {
+                const seedModule2 = await import("./data/seedPosts.js");
+                seedPosts = seedModule2.seedPosts || [];
+            } catch (err) {
+                console.log("No seed dataset file found.");
+            }
         }
 
         for (const postData of seedPosts) {
@@ -410,11 +456,7 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
             );
         }
 
-        // Migration helper: Ensure any legacy unassigned posts get categorized
-        await Post.updateMany(
-            { $or: [{ category: { $exists: false } }, { category: "General" }, { category: null }] },
-            { $set: { category: "Tech" } }
-        );
+        await autoCategorizePosts();
 
         res.redirect("/");
     } catch (error) {
