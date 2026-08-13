@@ -400,13 +400,14 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Session middleware configuration
+// Session middleware configuration (2 hours TTL, rolling refresh on activity)
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    rolling: true, // Refreshes 2-hour session expiration timer on user activity
     cookie: {
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        maxAge: 2 * 60 * 60 * 1000 // 2 hours in milliseconds
     }
 }));
 
