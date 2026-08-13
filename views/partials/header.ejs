@@ -25,6 +25,7 @@
 
         <!-- Session & Authentication Controls -->
         <% if (currentUser) { %>
+            <a href="/my-posts" class="my-posts-link">📚 My Posts</a>
             <a href="/new" class="new-post-btn">✍️ Create Post</a>
             <div class="user-profile-badge">
                 <% if (currentUser.avatar) { %>
@@ -38,6 +39,7 @@
                 <button type="submit" class="logout-btn">Logout</button>
             </form>
         <% } else if (isAdmin) { %>
+            <a href="/my-posts" class="my-posts-link">📚 My Posts</a>
             <a href="/new" class="new-post-btn">+ New Post</a>
             <span class="admin-badge">👑 Admin</span>
             <form action="/logout" method="POST" style="margin:0;">

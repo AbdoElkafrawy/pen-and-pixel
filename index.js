@@ -716,11 +716,58 @@ app.post("/new", ensureAuthenticated, upload.single("image"), async (req, res) =
         });
 
         await newPost.save();
-        res.redirect("/");
+        res.redirect("/my-posts");
 
     } catch (error) {
         console.error("Create Post Error:", error);
         res.status(500).send("Error creating post");
+    }
+});
+
+
+/* -------------------------------------------------------
+   MY POSTS DASHBOARD ROUTE (Protected)
+   ------------------------------------------------------- */
+
+app.get("/my-posts", ensureAuthenticated, async (req, res) => {
+    try {
+        let filter = {};
+
+        if (req.user) {
+            filter = { "author.id": req.user._id };
+        } else if (req.session.isAdmin) {
+            filter = {
+                $or: [
+                    { "author.id": { $exists: false } },
+                    { "author.name": "Admin" },
+                    { "author.name": "Pen & Pixel Editorial" }
+                ]
+            };
+        }
+
+        const myPosts = await Post.find(filter).sort({ createdAt: -1 });
+
+        const formattedPosts = myPosts.map(post => {
+            const createdAtDate = post.createdAt instanceof Date ? post.createdAt : new Date(post.createdAt);
+            return {
+                ...post.toObject(),
+                id: post._id.toString(),
+                readingTime: calculateReadingTime(post.content),
+                createdAtDisplay: createdAtDate.toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                })
+            };
+        });
+
+        res.render("my-posts", { posts: formattedPosts });
+
+    } catch (error) {
+        console.error("My Posts Route Error:", error);
+        res.status(500).send("Error loading your posts dashboard.");
     }
 });
 
