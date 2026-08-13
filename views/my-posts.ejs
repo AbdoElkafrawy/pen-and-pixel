@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", { title: "📚 My Posts Dashboard — Pen & Pixel" }) %>
+</head>
+<body>
+
+    <%- include("partials/header") %>
+
+    <main class="main-container">
+        
+        <!-- Dashboard Header Banner -->
+        <section class="dashboard-header-card">
+            <div class="dashboard-user-info">
+                <% if (currentUser && currentUser.avatar) { %>
+                    <img src="<%= currentUser.avatar %>" alt="<%= currentUser.displayName %>" class="dashboard-avatar">
+                <% } else { %>
+                    <div class="dashboard-avatar-placeholder">👤</div>
+                <% } %>
+                <div>
+                    <h1 class="dashboard-title">📚 My Articles Dashboard</h1>
+                    <p class="dashboard-subtitle">
+                        Author: <strong><%= currentUser ? currentUser.displayName : 'Admin' %></strong> • 
+                        <span class="count-badge"><%= posts.length %> <%= posts.length === 1 ? 'Article' : 'Articles' %> Published</span>
+                    </p>
+                </div>
+            </div>
+
+            <a href="/new" class="create-post-btn-large">✍️ Write New Article</a>
+        </section>
+
+        <!-- User Articles Feed -->
+        <section class="posts-magazine">
+
+            <% if (posts.length === 0) { %>
+                <div class="empty-dashboard-card">
+                    <div class="empty-icon">📝</div>
+                    <h2>No Articles Published Yet</h2>
+                    <p>You haven't published any articles on Pen &amp; Pixel yet. Share your thoughts, technology insights, or story with our readers!</p>
+                    <a href="/new" class="submit-btn" style="display: inline-block; margin-top: 15px; text-decoration: none;">✍️ Publish Your First Article</a>
+                </div>
+            <% } else { %>
+                <div class="posts-grid">
+                    <% posts.forEach((post) => { %>
+                        <article class="post-card grid-card dashboard-post-card">
+                            <% if (post.image) { %>
+                                <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image grid-image">
+                            <% } %>
+
+                            <div class="post-header">
+                                <span class="card-category-tag"><%= post.category || 'General' %></span>
+                                <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
+                                <p class="post-meta">
+                                    📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
+                                </p>
+                            </div>
+
+                            <div class="post-body">
+                                <p>
+                                    <% if (post.content.length > 150) { %>
+                                        <%= post.content.substring(0, 150) %>...
+                                    <% } else { %>
+                                        <%= post.content %>
+                                    <% } %>
+                                </p>
+                            </div>
+
+                            <div class="post-footer">
+                                <a href="/posts/<%= post.id %>" class="read-more">👁️ View &rarr;</a>
+
+                                <div class="post-footer-right">
+                                    <span class="comments-badge" title="Comments">
+                                        💬 <%= (post.comments || []).length %>
+                                    </span>
+                                    <span class="likes-badge" title="Likes">
+                                        ❤️ <%= post.likes || 0 %>
+                                    </span>
+
+                                    <div class="post-actions">
+                                        <a class="edit-btn" href="/posts/<%= post.id %>/edit">✏️ Edit</a>
+                                        <form action="/posts/<%= post.id %>/delete" method="POST">
+                                            <button class="delete-btn" onclick="return confirm('Delete this post?')" type="submit">
+                                                🗑️ Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    <% }); %>
+                </div>
+            <% } %>
+
+        </section>
+
+    </main>
+
+    <%- include("partials/footer") %>
+
+</body>
+</html>

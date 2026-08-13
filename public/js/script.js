@@ -59,7 +59,7 @@ function setupCounter(input, counter, maxLength, warningLimit, dangerLimit) {
 }
 
 setupCounter(titleInput, titleCounter, 100, 80, 95);
-setupCounter(contentInput, contentCounter, 5000, 4000, 4750);
+setupCounter(contentInput, contentCounter, 8000, 7000, 7800);
 
 
 // =======================================================

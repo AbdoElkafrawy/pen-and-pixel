@@ -63,12 +63,18 @@ Pen & Pixel enables authors to publish and manage blog posts with cover images w
 - **Quote of the Day**: Fetches inspirational quotes from `API Ninjas`.
 - **Fault-Tolerant Design**: Homepage continues to load seamlessly even if third-party APIs fail.
 
+### 🔐 Google OAuth 2.0 Sign-In & Role-Based Permissions
+- **Google Sign-In**: Readers can log in securely using their Google accounts (`passport-google-oauth20`).
+- **Author Ownership**: Registered users can publish new blog posts (`/new`) and manage their articles on a dedicated **"My Posts" Dashboard** (`/my-posts`).
+- **Strict Permission Enforcement**: Registered users can **edit and delete ONLY posts they created**. Attempting to modify another author's post is strictly blocked on both the server (`403 Forbidden`) and hidden in the UI.
+- **Admin Master Control**: The Admin user retains full master privileges across all posts, comment moderation, and database seeding.
+
 ---
 
 ## 🛠️ Tech Stack
 
 - **Backend**: Node.js, Express.js (v5), MongoDB Atlas, Mongoose ODM
-- **Authentication**: `express-session`, `bcryptjs`
+- **Authentication**: Passport.js (`passport-google-oauth20`), `express-session`, `bcryptjs`
 - **Media & File Storage**: `multer`, `cloudinary`, `multer-storage-cloudinary`
 - **Frontend Engine**: EJS (Embedded JavaScript templates with EJS Partials)
 - **Styling**: Vanilla CSS (Modular CSS custom variables, Flexbox, CSS Grid)
@@ -89,6 +95,11 @@ API_NINJAS_KEY=your_api_ninjas_key
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
+
+# Google OAuth 2.0 Credentials
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
 ```
 
 ---
