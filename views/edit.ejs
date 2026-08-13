@@ -30,7 +30,19 @@
                 >
                 <p id="title-counter" class="counter">0 / 100</p>
             </div>
-        
+
+            <div class="form-group">
+                <label for="category">Category <span class="required">*</span></label>
+                <select id="category" name="category" required class="form-select">
+                    <% const cats = ["Tech", "Politics", "Science", "Cinema", "Art", "Crypto", "Society"]; %>
+                    <% cats.forEach(cat => { %>
+                        <option value="<%= cat %>" <%= (post.category === cat) ? 'selected' : '' %>>
+                            <%= cat === 'Tech' ? '💻 Tech' : (cat === 'Politics' ? '🏛️ Politics' : (cat === 'Science' ? '🔬 Science' : (cat === 'Cinema' ? '🎬 Cinema' : (cat === 'Art' ? '🎨 Art' : (cat === 'Crypto' ? '🪙 Crypto' : '🏙️ Society'))))) %>
+                        </option>
+                    <% }); %>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label for="content">Content <span class="required">*</span></label>
                 <textarea 

@@ -21,11 +21,13 @@ import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 
-// Session middleware for managing user authentication state
+// Session middleware & Password hashing utility
 import session from "express-session";
-
-// Password hashing utility for secure credential verification
 import bcrypt from "bcryptjs";
+
+// Passport.js for Google OAuth 2.0 Authentication
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 // Custom helper: calculates estimated reading time for post content
 import calculateReadingTime from "./helpers/readingTime.js";
@@ -67,6 +69,37 @@ await mongoose.connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/blo
 // Hash the admin password once on startup using 10 salt rounds
 const ADMIN_HASH = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
 
+// Defines the MongoDB schema for registered users (Google OAuth)
+const userSchema = new mongoose.Schema({
+    googleId: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    displayName: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    avatar: {
+        type: String
+    },
+    role: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user"
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+const User = mongoose.model("User", userSchema);
+
 // Defines the MongoDB schema for blog posts
 const postSchema = new mongoose.Schema({
     title: {
@@ -91,6 +124,22 @@ const postSchema = new mongoose.Schema({
         trim: true
     },
 
+    author: {
+        id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: false
+        },
+        name: {
+            type: String,
+            default: "Pen & Pixel Editorial"
+        },
+        avatar: {
+            type: String,
+            default: ""
+        }
+    },
+
     createdAt: {
         type: Date,
         required: true,
@@ -109,6 +158,14 @@ const postSchema = new mongoose.Schema({
                 required: true,
                 trim: true
             },
+            authorName: {
+                type: String,
+                default: "Anonymous"
+            },
+            authorAvatar: {
+                type: String,
+                default: ""
+            },
             createdAt: {
                 type: Date,
                 default: Date.now
@@ -119,6 +176,47 @@ const postSchema = new mongoose.Schema({
 
 // Compile the Post model
 const Post = mongoose.model("Post", postSchema);
+
+// Configure Passport Google Strategy
+passport.use(
+    new GoogleStrategy(
+        {
+            clientID: process.env.GOOGLE_CLIENT_ID || "placeholder_google_client_id",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || "placeholder_google_client_secret",
+            callbackURL: process.env.GOOGLE_CALLBACK_URL || "/auth/google/callback"
+        },
+        async (accessToken, refreshToken, profile, done) => {
+            try {
+                let user = await User.findOne({ googleId: profile.id });
+                if (!user) {
+                    user = await User.create({
+                        googleId: profile.id,
+                        displayName: profile.displayName || "Anonymous Reader",
+                        email: (profile.emails && profile.emails[0]) ? profile.emails[0].value : "",
+                        avatar: (profile.photos && profile.photos[0]) ? profile.photos[0].value : "",
+                        role: "user"
+                    });
+                }
+                return done(null, user);
+            } catch (err) {
+                return done(err, null);
+            }
+        }
+    )
+);
+
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (err) {
+        done(err, null);
+    }
+});
 
 // Auto-Categorization Migration Helper for legacy DB documents
 async function autoCategorizePosts() {
@@ -282,11 +380,49 @@ app.use(session({
     }
 }));
 
+// Initialize Passport.js for Google OAuth
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Global view variables available in all EJS templates
 app.use((req, res, next) => {
-    res.locals.isAdmin = req.session.isAdmin || false;
+    res.locals.currentUser = req.user || null;
+    res.locals.isAdmin = req.session.isAdmin || (req.user && req.user.role === "admin") || false;
     next();
 });
+
+// Middleware: checks if user is logged in via Google OR is Admin
+const ensureAuthenticated = (req, res, next) => {
+    if (req.isAuthenticated() || req.session.isAdmin) {
+        return next();
+    }
+    res.redirect("/login");
+};
+
+// Middleware: checks if logged in user is the Author of the post OR is Admin
+const ensureCanEditPost = async (req, res, next) => {
+    try {
+        if (req.session.isAdmin) return next();
+
+        if (!req.isAuthenticated()) {
+            return res.status(401).send("You must be logged in to modify posts.");
+        }
+
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            return res.status(404).send("Post not found.");
+        }
+
+        if (post.author && post.author.id && post.author.id.toString() === req.user._id.toString()) {
+            return next();
+        }
+
+        return res.status(403).send("Forbidden: You can only edit or delete your own posts.");
+    } catch (err) {
+        console.error("Authorization check error:", err);
+        return res.status(500).send("Server error during authorization check.");
+    }
+};
 
 // Weather API cache map (1 hour TTL)
 const weatherCache = new Map();
@@ -426,11 +562,23 @@ app.get("/", async (req, res) => {
 
 
 /* -------------------------------------------------------
-   AUTHENTICATION ROUTES (Admin Login / Logout)
+   AUTHENTICATION ROUTES (Google OAuth & Admin Login / Logout)
    ------------------------------------------------------- */
 
+// Google OAuth Trigger Route
+app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+
+// Google OAuth Callback Route
+app.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { failureRedirect: "/login?error=auth_failed" }),
+    (req, res) => {
+        res.redirect("/");
+    }
+);
+
 app.get("/login", (req, res) => {
-    if (req.session.isAdmin) {
+    if (req.session.isAdmin || req.isAuthenticated()) {
         return res.redirect("/");
     }
     res.render("login", { error: null });
@@ -448,9 +596,13 @@ app.post("/login", async (req, res) => {
     }
 });
 
-app.post("/logout", (req, res) => {
-    req.session.destroy(() => {
-        res.redirect("/");
+app.post("/logout", (req, res, next) => {
+    req.session.isAdmin = false;
+    req.logout((err) => {
+        if (err) console.error("Passport logout error:", err);
+        req.session.destroy(() => {
+            res.redirect("/");
+        });
     });
 });
 
@@ -493,21 +645,41 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
 
 
 /* -------------------------------------------------------
-   CREATE POST ROUTES (Protected)
+   CREATE POST ROUTES (Protected: Logged In Users & Admin)
    ------------------------------------------------------- */
 
-app.get("/new", requireAuth, (req, res) => {
+app.get("/new", ensureAuthenticated, (req, res) => {
     res.render("new");
 });
 
-app.post("/new", requireAuth, upload.single("image"), async (req, res) => {
+app.post("/new", ensureAuthenticated, upload.single("image"), async (req, res) => {
     try {
-        const { title, content } = req.body;
+        const { title, content, category } = req.body;
         const image = req.file ? (req.file.path || `/images/${req.file.filename}`) : undefined;
+
+        let authorInfo = {
+            name: "Pen & Pixel Editorial",
+            avatar: ""
+        };
+
+        if (req.user) {
+            authorInfo = {
+                id: req.user._id,
+                name: req.user.displayName,
+                avatar: req.user.avatar
+            };
+        } else if (req.session.isAdmin) {
+            authorInfo = {
+                name: "Admin",
+                avatar: ""
+            };
+        }
 
         const newPost = new Post({
             title,
             content,
+            category: category || "General",
+            author: authorInfo,
             ...(image && { image }),
             createdAt: new Date()
         });
@@ -558,10 +730,10 @@ app.get("/posts/:id", async (req, res) => {
 
 
 /* -------------------------------------------------------
-   EDIT POST ROUTES (Protected)
+   EDIT POST ROUTES (Protected: Author or Admin)
    ------------------------------------------------------- */
 
-app.get("/posts/:id/edit", requireAuth, async (req, res) => {
+app.get("/posts/:id/edit", ensureCanEditPost, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
 
@@ -577,16 +749,16 @@ app.get("/posts/:id/edit", requireAuth, async (req, res) => {
     }
 });
 
-app.post("/posts/:id/edit", requireAuth, upload.single("image"), async (req, res) => {
+app.post("/posts/:id/edit", ensureCanEditPost, upload.single("image"), async (req, res) => {
     try {
-        const { title, content } = req.body;
+        const { title, content, category } = req.body;
         const existingPost = await Post.findById(req.params.id);
 
         if (!existingPost) {
             return res.status(404).send("Post not found");
         }
 
-        const updateData = { title, content };
+        const updateData = { title, content, ...(category && { category }) };
 
         if (req.file) {
             if (existingPost.image) {
@@ -611,10 +783,10 @@ app.post("/posts/:id/edit", requireAuth, upload.single("image"), async (req, res
 
 
 /* -------------------------------------------------------
-   DELETE POST ROUTE (Protected)
+   DELETE POST ROUTE (Protected: Author or Admin)
    ------------------------------------------------------- */
 
-app.post("/posts/:id/delete", requireAuth, async (req, res) => {
+app.post("/posts/:id/delete", ensureCanEditPost, async (req, res) => {
     try {
         const deletedPost = await Post.findByIdAndDelete(req.params.id);
 

@@ -106,6 +106,9 @@
                             <h2><a href="/posts/<%= featuredPost.id %>"><%= featuredPost.title %></a></h2>
                             <p class="post-meta">
                                 📅 <%= featuredPost.createdAtDisplay || featuredPost.createdAt %> • ⏱️ <%= featuredPost.readingTime %> min read
+                                <% if (featuredPost.author && featuredPost.author.name) { %>
+                                    • ✍️ <%= featuredPost.author.name %>
+                                <% } %>
                             </p>
                         </div>
 
@@ -135,7 +138,8 @@
                                     ❤️ <span class="like-count"><%= featuredPost.likes || 0 %></span>
                                 </button>
 
-                                <% if (isAdmin) { %>
+                                <% const canEditFeatured = isAdmin || (currentUser && featuredPost.author && featuredPost.author.id && String(featuredPost.author.id) === String(currentUser._id)); %>
+                                <% if (canEditFeatured) { %>
                                     <div class="post-actions">
                                         <a class="edit-btn" href="/posts/<%= featuredPost.id %>/edit">Edit</a>
                                         <form action="/posts/<%= featuredPost.id %>/delete" method="POST">
@@ -168,6 +172,9 @@
                                 <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
                                 <p class="post-meta">
                                     📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
+                                    <% if (post.author && post.author.name) { %>
+                                        • ✍️ <%= post.author.name %>
+                                    <% } %>
                                 </p>
                             </div>
 
@@ -197,7 +204,8 @@
                                         ❤️ <span class="like-count"><%= post.likes || 0 %></span>
                                     </button>
 
-                                    <% if (isAdmin) { %>
+                                    <% const canEdit = isAdmin || (currentUser && post.author && post.author.id && String(post.author.id) === String(currentUser._id)); %>
+                                    <% if (canEdit) { %>
                                         <div class="post-actions">
                                             <a class="edit-btn" href="/posts/<%= post.id %>/edit">Edit</a>
                                             <form action="/posts/<%= post.id %>/delete" method="POST">

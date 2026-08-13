@@ -17,11 +17,14 @@
 
         <p class="post-meta single">
             📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
+            <% if (post.author && post.author.name) { %>
+                • ✍️ <%= post.author.name %>
+            <% } %>
         </p>
 
         <p class="post-body"><%= post.content %></p>
 
-        <!-- Like button and Admin actions -->
+        <!-- Like button and Actions (Owner or Admin) -->
         <div class="single-post-footer">
             <button
                 class="like-btn like-btn-large"
@@ -31,7 +34,8 @@
                 ❤️ <span class="like-count"><%= post.likes || 0 %></span> Likes
             </button>
 
-            <% if (isAdmin) { %>
+            <% const canEditSingle = isAdmin || (currentUser && post.author && post.author.id && String(post.author.id) === String(currentUser._id)); %>
+            <% if (canEditSingle) { %>
                 <div class="post-actions">
                     <a class="edit-btn" href="/posts/<%= post._id %>/edit">Edit</a>
                     <form action="/posts/<%= post._id %>/delete" method="POST">
@@ -57,7 +61,14 @@
                     <% post.comments.forEach(comment => { %>
                         <div class="comment-card">
                             <div class="comment-header">
-                                <span class="comment-author">👤 Anonymous</span>
+                                <span class="comment-author">
+                                    <% if (comment.authorAvatar) { %>
+                                        <img src="<%= comment.authorAvatar %>" alt="" class="comment-avatar-small">
+                                    <% } else { %>
+                                        👤 
+                                    <% } %>
+                                    <%= comment.authorName || 'Anonymous' %>
+                                </span>
                                 <span class="comment-date">
                                     <%= new Date(comment.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }) %>
                                 </span>
