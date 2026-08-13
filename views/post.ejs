@@ -18,7 +18,7 @@
         <p class="post-meta single">
             📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
             <% if (post.author && post.author.name) { %>
-                • ✍️ <%= post.author.name %>
+                • <a href="/?author=<%= encodeURIComponent(post.author.name) %>" class="author-filter-link">✍️ <%= post.author.name %></a>
             <% } %>
         </p>
 

@@ -471,6 +471,7 @@ app.get("/", async (req, res) => {
     try {
         const search = req.query.search;
         const selectedCategory = req.query.category;
+        const selectedAuthor = req.query.author;
 
         const filter = {};
 
@@ -483,6 +484,10 @@ app.get("/", async (req, res) => {
 
         if (selectedCategory && selectedCategory !== "All") {
             filter.category = { $regex: `^${selectedCategory}$`, $options: "i" };
+        }
+
+        if (selectedAuthor) {
+            filter["author.name"] = { $regex: `^${selectedAuthor}$`, $options: "i" };
         }
 
         const posts = await Post.find(filter).sort({ createdAt: -1 });
@@ -582,6 +587,7 @@ app.get("/", async (req, res) => {
             quote,
             search,
             currentCategory: selectedCategory || "All",
+            currentAuthor: selectedAuthor || null,
             categories: combinedCategories
         });
 

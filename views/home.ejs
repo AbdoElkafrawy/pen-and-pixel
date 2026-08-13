@@ -76,6 +76,8 @@
                 <h2 class="posts-heading">
                     Search Results for "<%= search %>" — <%= posts.length %> <%= posts.length === 1 ? 'post' : 'posts' %>
                 </h2>
+            <% } else if (typeof currentAuthor !== 'undefined' && currentAuthor) { %>
+                <h2 class="posts-heading">Showing Posts by Author: "✍️ <%= currentAuthor %>" — <%= posts.length %> <%= posts.length === 1 ? 'post' : 'posts' %> <a href="/" class="clear-search-btn" style="font-size:0.8rem; margin-left: 10px;">Clear Filter</a></h2>
             <% } else if (currentCategory && currentCategory !== 'All') { %>
                 <h2 class="posts-heading">Showing Category: "<%= currentCategory %>" — <%= posts.length %> <%= posts.length === 1 ? 'post' : 'posts' %></h2>
             <% } else { %>
@@ -107,7 +109,7 @@
                             <p class="post-meta">
                                 📅 <%= featuredPost.createdAtDisplay || featuredPost.createdAt %> • ⏱️ <%= featuredPost.readingTime %> min read
                                 <% if (featuredPost.author && featuredPost.author.name) { %>
-                                    • ✍️ <%= featuredPost.author.name %>
+                                    • <a href="/?author=<%= encodeURIComponent(featuredPost.author.name) %>" class="author-filter-link">✍️ <%= featuredPost.author.name %></a>
                                 <% } %>
                             </p>
                         </div>
@@ -173,7 +175,7 @@
                                 <p class="post-meta">
                                     📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
                                     <% if (post.author && post.author.name) { %>
-                                        • ✍️ <%= post.author.name %>
+                                        • <a href="/?author=<%= encodeURIComponent(post.author.name) %>" class="author-filter-link">✍️ <%= post.author.name %></a>
                                     <% } %>
                                 </p>
                             </div>
