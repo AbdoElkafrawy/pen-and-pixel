@@ -279,10 +279,11 @@ async function autoSeedIfEmpty() {
     }
 }
 
-// Run category migration and auto-seeding on server startup
+// Run category migration, auto-seeding, and image path cleanup on server startup
 (async () => {
     await autoCategorizePosts();
     await autoSeedIfEmpty();
+    await fixImagePaths();
 })();
 
 
@@ -355,6 +356,35 @@ function deleteImageFile(imageUrl) {
                 console.error("Image cleanup error:", err.message);
             }
         });
+    }
+}
+
+// Helper: returns clean image URL for Cloudinary HTTPS or local /images/ path
+function getImageUrl(file) {
+    if (!file) return undefined;
+    if (file.path && (file.path.startsWith("http://") || file.path.startsWith("https://"))) {
+        return file.path;
+    }
+    return `/images/${file.filename}`;
+}
+
+// Migration helper: fix any local image paths in MongoDB that had 'public/' or 'public\' prefix
+async function fixImagePaths() {
+    try {
+        const postsWithBadPaths = await Post.find({
+            image: { $regex: "^public[/\\\\]", $options: "i" }
+        });
+
+        for (const post of postsWithBadPaths) {
+            let cleanPath = post.image.replace(/^public[/\\\\]/i, "images/").replace(/\\/g, "/");
+            if (!cleanPath.startsWith("/")) {
+                cleanPath = "/" + cleanPath;
+            }
+            post.image = cleanPath;
+            await post.save();
+        }
+    } catch (err) {
+        console.error("Image path migration error:", err);
     }
 }
 
@@ -655,7 +685,7 @@ app.get("/new", ensureAuthenticated, (req, res) => {
 app.post("/new", ensureAuthenticated, upload.single("image"), async (req, res) => {
     try {
         const { title, content, category } = req.body;
-        const image = req.file ? (req.file.path || `/images/${req.file.filename}`) : undefined;
+        const image = getImageUrl(req.file);
 
         let authorInfo = {
             name: "Pen & Pixel Editorial",
@@ -764,7 +794,7 @@ app.post("/posts/:id/edit", ensureCanEditPost, upload.single("image"), async (re
             if (existingPost.image) {
                 deleteImageFile(existingPost.image);
             }
-            updateData.image = req.file.path || `/images/${req.file.filename}`;
+            updateData.image = getImageUrl(req.file);
         }
 
         await Post.findByIdAndUpdate(
