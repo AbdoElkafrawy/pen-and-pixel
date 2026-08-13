@@ -158,8 +158,34 @@ async function autoCategorizePosts() {
     }
 }
 
-// Automatically categorize unassigned legacy posts on startup
-autoCategorizePosts();
+// Auto-Seed Helper: Automatically seeds the database if post count is under 20
+async function autoSeedIfEmpty() {
+    try {
+        const count = await Post.countDocuments();
+        if (count < 20) {
+            console.log(`[Auto-Seed] Database currently has ${count} posts. Seeding complete dataset...`);
+            const seedModule = await import("./seedData.js");
+            const seedPosts = seedModule.seedPosts || [];
+
+            for (const postData of seedPosts) {
+                await Post.findOneAndUpdate(
+                    { title: postData.title },
+                    postData,
+                    { upsert: true, new: true }
+                );
+            }
+            console.log("[Auto-Seed] Successfully seeded all 28 articles!");
+        }
+    } catch (err) {
+        console.error("Auto-seed error:", err);
+    }
+}
+
+// Run category migration and auto-seeding on server startup
+(async () => {
+    await autoCategorizePosts();
+    await autoSeedIfEmpty();
+})();
 
 
 // =======================================================
