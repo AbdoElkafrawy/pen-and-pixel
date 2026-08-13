@@ -602,8 +602,13 @@ app.get("/", async (req, res) => {
    AUTHENTICATION ROUTES (Google OAuth & Admin Login / Logout)
    ------------------------------------------------------- */
 
-// Google OAuth Trigger Route
-app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+// Google OAuth Trigger Route (checks environment credentials before authenticating)
+app.get("/auth/google", (req, res, next) => {
+    if (!process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID.startsWith("placeholder")) {
+        return res.render("login", { error: "Google OAuth is not configured on this server yet. Please add GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET to environment variables." });
+    }
+    passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
+});
 
 // Google OAuth Callback Route
 app.get(
