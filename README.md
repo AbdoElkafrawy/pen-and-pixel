@@ -6,38 +6,51 @@
 
 A modern, feature-rich full-stack blogging platform built with **Node.js**, **Express.js**, **MongoDB**, **Mongoose**, **Cloudinary**, and **EJS**.
 
-Pen & Pixel enables authors to publish and manage blog posts with cover images while providing readers with interactive capabilities like **instant post likes**, **comments**, **dark mode**, **search**, **estimated reading time**, **live weather forecasts**, and **inspirational daily quotes**.
+Pen & Pixel enables authors to publish and manage blog posts with cover images while providing readers with interactive capabilities like **instant post likes**, **comments**, **dark mode**, **category filtering**, **search**, **estimated reading time**, **live weather forecasts**, and **inspirational daily quotes**.
 
 ---
 
-##  Features Breakdown
+## ✨ Features Breakdown
 
-###  Blog Post Management (CRUD)
-- **Create**: Add new posts with titles, rich content, and cover image uploads.
-- **Read**: View the latest posts feed sorted chronologically, or read individual post pages.
-- **Edit**: Update existing posts and replace cover images with automatic old-image cleanup.
-- **Delete**: Remove posts and automatically delete associated uploaded image files from disk.
+### 📰 3-Column Magazine Grid Layout
+- **Featured Story Hero Banner**: The newest post takes center stage at the top in a prominent 2-column featured hero card with a `⭐ Featured Story` badge.
+- **3-Column Card Grid**: Remaining posts are organized in a spacious 3-column card grid across an expanded `1320px` wide container.
+- **Responsive Breakpoints**: Seamlessly scales from 3 columns on desktop, to 2 columns on tablets (under 1150px), and 1 column on mobile devices (under 768px).
 
-###  Admin Authentication
-- **Secure Sessions**: Protected routes (`/new`, `/posts/:id/edit`, `/posts/:id/delete`, comment deletion) require an active admin session using `express-session`.
+### 🏷️ Dynamic Category Filtering
+- **Category Navigation Bar**: Interactive pill buttons at the top of the feed (`All`, `Tech`, `Politics`, `Science`, `Cinema`, `Art`, `Crypto`, `Society`).
+- **Server-Side Filtering**: Clicking a category filters MongoDB query results via `?category=Name` with an active pill highlight.
+- **Card Category Badges**: Every post card displays a color-coded category tag badge in its header.
+
+### 📝 Blog Post Management (CRUD)
+- **Create**: Add new posts with titles, content, categories, and cover image uploads.
+- **Read**: View the magazine feed sorted chronologically, or read single post pages with full content.
+- **Edit**: Update existing posts, categories, and replace cover images with automatic cleanup.
+- **Delete**: Remove posts and automatically clean up associated cloud media assets.
+
+### 🔒 Admin Authentication & Security
+- **Secure Sessions**: Protected write routes (`/new`, `/posts/:id/edit`, `/posts/:id/delete`, comment deletion) require an active admin session using `express-session`.
 - **Password Hashing**: Uses `bcryptjs` with 10 salt rounds to securely hash and verify admin credentials.
+- **Strict Secrets Policy**: All sensitive variables (`MONGODB_URI`, `ADMIN_PASSWORD`, `SESSION_SECRET`, `CLOUDINARY_*`) are enforced strictly via environment variables (`process.env`) with zero hardcoded fallback credentials.
 - **UI Guarding**: Admin-only controls (`+ New Post`, `Edit`, `Delete`) automatically hide from public visitors.
 
 ### ❤️ Interactive Like / Unlike System
-- **AJAX / Fetch API**: Users can like or unlike posts instantly without triggering a full page reload.
+- **AJAX / Fetch API**: Users can toggle post likes instantly without triggering a full page reload.
 - **Atomic Database Updates**: Uses MongoDB's `$inc` operator for race-condition-free counter updates.
-- **LocalStorage Persistence**: Browser `localStorage` remembers which posts the user has liked across page reloads.
+- **LocalStorage Persistence**: Browser `localStorage` remembers liked posts across sessions.
 
 ### 💬 Reader Comments & Moderation
 - **Embedded Document Model**: Comments are stored natively inside each MongoDB post document using embedded sub-documents.
 - **Anonymous Reader Comments**: Anyone can leave comments on blog posts.
 - **Admin Moderation**: Admin users can delete inappropriate comments with a single click (`$pull` operator).
 
-### 🖼️ Image Uploads & Responsive Layouts
-- **Multer Integration**: Supports image file uploads up to 5MB with MIME type validation.
-- **Responsive Display**: 
-  - **Feed View**: Images use `object-fit: cover` with a `360px` max-height to ensure uniform, compact cards.
-  - **Detail View**: Images display at full natural dimensions on the single post page.
+### ☁️ Cloud Image Hosting (Cloudinary)
+- **Production Storage**: Uploaded cover images are stored permanently in **Cloudinary Cloud Storage** via `multer-storage-cloudinary`.
+- **Ephemeral Protection**: Server restarts or deployments never wipe images.
+
+### 🌙 Dark Mode & Adaptive Theme
+- **Theme Switcher**: Instant light/dark mode toggle button with preference stored in `localStorage`.
+- **Adaptive Widgets**: Weather card and post cards dynamically switch between fresh light gradients and dark slate themes.
 
 ### 🔍 Real-Time Post Search
 - Searches titles and body content using MongoDB case-insensitive regex queries (`$regex` / `$options: "i"`).
@@ -52,106 +65,56 @@ Pen & Pixel enables authors to publish and manage blog posts with cover images w
 
 ---
 
-##  Tech Stack
+## 🛠️ Tech Stack
 
-- **Backend**: Node.js, Express.js (v5), MongoDB, Mongoose ODM
+- **Backend**: Node.js, Express.js (v5), MongoDB Atlas, Mongoose ODM
 - **Authentication**: `express-session`, `bcryptjs`
-- **File Uploads**: `multer`
+- **Media & File Storage**: `multer`, `cloudinary`, `multer-storage-cloudinary`
 - **Frontend Engine**: EJS (Embedded JavaScript templates with EJS Partials)
-- **Styling**: Vanilla CSS3 (Flexbox, CSS Grid, Smooth Animations)
-- **APIs & Utilities**: `axios`, `dotenv`
+- **Styling**: Vanilla CSS (Modular CSS custom variables, Flexbox, CSS Grid)
+- **Deployment**: Render (Web Service), MongoDB Atlas (Cloud Database), Cloudinary (Cloud Storage)
 
 ---
 
-## 📂 Project Directory Structure
+## 🚀 Environment Variables
 
-```text
-pen-and-pixel/
-├── helpers/
-│   └── readingTime.js       # Reading time estimation helper
-├── middleware/
-│   └── requireAuth.js       # Route protection middleware for admin routes
-├── public/
-│   ├── css/
-│   │   └── style.css        # Clean, modular design system & responsive layout
-│   ├── images/              # Uploaded post cover images (managed by Multer)
-│   └── js/
-│       └── script.js        # Client-side JavaScript (character counters & AJAX like toggle)
-├── views/
-│   ├── partials/
-│   │   ├── head.ejs         # Reusable HTML head & stylesheet links
-│   │   ├── header.ejs       # Reusable top navigation header & search bar
-│   │   └── footer.ejs       # Reusable footer & client script tags
-│   ├── home.ejs             # Main blog feed, search results, weather & quote widgets
-│   ├── post.ejs             # Single post view & comments section
-│   ├── new.ejs              # Create new post form
-│   ├── edit.ejs             # Edit post form
-│   └── login.ejs            # Admin login view
-├── .env                     # Environment variables (git-ignored)
-├── index.js                 # Express application server & MongoDB models
-├── package.json             # Node dependencies and project metadata
-└── README.md                # Project documentation
+To run this project locally or in production, configure the following variables in your `.env` file or hosting provider:
+
+```env
+PORT=3000
+MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/blog
+ADMIN_PASSWORD=your_secure_admin_password
+SESSION_SECRET=your_random_session_secret
+API_NINJAS_KEY=your_api_ninjas_key
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 ---
 
-##  Getting Started
+## 💻 Local Development Setup
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or higher recommended)
-- [MongoDB](https://www.mongodb.com/) running locally on port `27017` (or a MongoDB Atlas connection string)
-
-### Installation
-
-1. **Clone the repository**
+1. **Clone the Repository**:
    ```bash
    git clone https://github.com/AbdoElkafrawy/pen-and-pixel.git
    cd pen-and-pixel
    ```
 
-2. **Install dependencies**
+2. **Install Dependencies**:
    ```bash
    npm install
    ```
 
-3. **Configure Environment Variables**
-   Create a `.env` file in the root directory:
-   ```env
-   # Database connection
-   MONGODB_URI=mongodb://127.0.0.1:27017/blog
+3. **Configure Environment Variables**:
+   Create a `.env` file in the root directory and populate the required keys.
 
-   # Application Port
-   PORT=3000
-
-   # API Ninjas key for Quotes
-   API_NINJAS_KEY=your_api_ninjas_key_here
-
-   # Admin Authentication (choose your own strong password and session secret)
-   ADMIN_PASSWORD=your_secure_admin_password_here
-   SESSION_SECRET=your_random_session_secret_key_here
-   ```
-
-4. **Start the application**
+4. **Start the Development Server**:
    ```bash
-   # Using nodemon for auto-reloading
-   npx nodemon index.js
-
-   # Or standard node
    npm start
+   # or
+   npm run dev
    ```
 
-5. **Access the application**
-   Open your browser and navigate to https://pen-and-pixel.onrender.com
-
----
-
-##  Author
-
-**Abdellatif Elkafrawy**
-- GitHub: [@AbdoElkafrawy](https://github.com/AbdoElkafrawy)
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
+5. **Access the Application**:
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
