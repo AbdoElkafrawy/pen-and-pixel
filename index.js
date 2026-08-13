@@ -410,6 +410,12 @@ app.get("/admin/seed", requireAuth, async (req, res) => {
             );
         }
 
+        // Migration helper: Ensure any legacy unassigned posts get categorized
+        await Post.updateMany(
+            { $or: [{ category: { $exists: false } }, { category: "General" }, { category: null }] },
+            { $set: { category: "Tech" } }
+        );
+
         res.redirect("/");
     } catch (error) {
         console.error("Seed Route Error:", error);
