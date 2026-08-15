@@ -11,9 +11,11 @@ function getSavedTheme() {
 function applyTheme(theme) {
     if (theme === "dark") {
         document.body.classList.add("dark-theme");
+        document.documentElement.classList.add("dark-theme");
         if (themeToggleBtn) themeToggleBtn.textContent = "☀️";
     } else {
         document.body.classList.remove("dark-theme");
+        document.documentElement.classList.remove("dark-theme");
         if (themeToggleBtn) themeToggleBtn.textContent = "🌙";
     }
 }

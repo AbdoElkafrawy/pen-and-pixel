@@ -12,4 +12,16 @@
 <!-- Primary Application Stylesheet -->
 <link rel="stylesheet" href="/css/style.css">
 
+<!-- Anti-FOUC Instant Theme Initializer (Defaults to Dark Theme) -->
+<script>
+    (function() {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        if (savedTheme === "light") {
+            document.documentElement.classList.remove("dark-theme");
+        } else {
+            document.documentElement.classList.add("dark-theme");
+        }
+    })();
+</script>
+
 <title><%= typeof title !== 'undefined' ? title : '🖋️ Pen & Pixel' %></title>
