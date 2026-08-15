@@ -56,22 +56,6 @@
         ======================================================= -->
         <section class="posts-magazine">
 
-            <!-- Category Filter Pills Navigation Bar -->
-            <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
-                <nav class="category-nav-bar" aria-label="Blog Categories">
-                    <div class="category-pills">
-                        <% categories.forEach((cat) => { %>
-                            <a 
-                                href="/?<%= search ? 'search=' + encodeURIComponent(search) + '&' : '' %>category=<%= encodeURIComponent(cat) %>" 
-                                class="category-pill <%= (currentCategory === cat) ? 'active' : '' %>"
-                            >
-                                <%= cat === 'All' ? '🌐 All' : (cat === 'Tech' ? '💻 Tech' : (cat === 'Politics' ? '🏛️ Politics' : (cat === 'Science' ? '🔬 Science' : (cat === 'Cinema' ? '🎬 Cinema' : (cat === 'Art' ? '🎨 Art' : (cat === 'Crypto' ? '🪙 Crypto' : (cat === 'Society' ? '🏙️ Society' : '🏷️ ' + cat))))))) %>
-                            </a>
-                        <% }); %>
-                    </div>
-                </nav>
-            <% } %>
-
             <% if (search) { %>
                 <h2 class="posts-heading">
                     Search Results for "<%= search %>" — <%= posts.length %> <%= posts.length === 1 ? 'post' : 'posts' %>
