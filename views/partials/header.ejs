@@ -106,6 +106,25 @@
     <nav class="mobile-drawer-links">
         <a href="/" class="mobile-drawer-item">🏠 Home Feed</a>
 
+        <!-- Categories Accordion Dropdown Sub-menu -->
+        <div class="mobile-drawer-submenu-group">
+            <button id="category-submenu-toggle" class="mobile-drawer-item category-submenu-btn" aria-expanded="false">
+                <span>🏷️ Categories</span>
+                <span class="submenu-arrow">▼</span>
+            </button>
+            <div id="category-submenu-list" class="mobile-drawer-submenu-list">
+                <a href="/" class="submenu-item">🌐 All Categories</a>
+                <a href="/?category=Tech%20Trends" class="submenu-item">💻 Tech Trends</a>
+                <a href="/?category=Design%20%26%20Art" class="submenu-item">🎨 Design &amp; Art</a>
+                <a href="/?category=Storytelling" class="submenu-item">📖 Storytelling</a>
+                <a href="/?category=Future%20Culture" class="submenu-item">✨ Future Culture</a>
+                <a href="/?category=Innovation" class="submenu-item">🚀 Innovation</a>
+                <a href="/?category=Editorial" class="submenu-item">✒️ Editorial</a>
+                <a href="/?category=Insights" class="submenu-item">💡 Insights</a>
+                <a href="/?category=General" class="submenu-item">📌 General</a>
+            </div>
+        </div>
+
         <% if (currentUser || isAdmin) { %>
             <a href="/my-posts" class="mobile-drawer-item">📚 My Articles Dashboard</a>
             <a href="/new" class="mobile-drawer-item mobile-highlight-item">✍️ Write New Article</a>

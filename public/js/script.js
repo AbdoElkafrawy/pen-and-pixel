@@ -229,6 +229,18 @@ function initMobileHeader() {
             }
         });
     }
+
+    // Categories Dropdown Sub-menu Accordion
+    const catSubmenuToggle = document.getElementById("category-submenu-toggle");
+    const catSubmenuList = document.getElementById("category-submenu-list");
+
+    if (catSubmenuToggle && catSubmenuList) {
+        catSubmenuToggle.addEventListener("click", () => {
+            const isOpen = catSubmenuList.classList.toggle("active");
+            catSubmenuToggle.classList.toggle("active");
+            catSubmenuToggle.setAttribute("aria-expanded", isOpen);
+        });
+    }
 }
 
 initMobileHeader();
