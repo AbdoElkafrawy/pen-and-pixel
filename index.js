@@ -724,6 +724,19 @@ app.post("/new", ensureAuthenticated, upload.single("image"), async (req, res) =
         const { title, content, category } = req.body;
         const image = getImageUrl(req.file);
 
+        // Server-side duplicate post protection (catches rapid double-clicks)
+        const tenSecondsAgo = new Date(Date.now() - 10 * 1000);
+        const duplicateCheck = await Post.findOne({
+            title,
+            content,
+            createdAt: { $gte: tenSecondsAgo }
+        });
+
+        if (duplicateCheck) {
+            console.log("[Duplicate Post Guard] Rapid double-submission caught and ignored.");
+            return res.redirect("/my-posts");
+        }
+
         let authorInfo = {
             name: "Pen & Pixel Editorial",
             avatar: ""

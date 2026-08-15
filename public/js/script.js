@@ -145,3 +145,45 @@ function initLikeButtons() {
 // Run when the page finishes loading
 initLikeButtons();
 
+
+// =======================================================
+//         FORM DOUBLE-SUBMISSION PREVENTION
+// =======================================================
+
+function initFormProtection() {
+    const forms = document.querySelectorAll("form");
+
+    forms.forEach(form => {
+        form.addEventListener("submit", function (e) {
+            if (form.dataset.submitting === "true") {
+                e.preventDefault();
+                return false;
+            }
+
+            form.dataset.submitting = "true";
+
+            const submitBtn = form.querySelector("button[type='submit'], input[type='submit']");
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = "0.7";
+                submitBtn.style.cursor = "not-allowed";
+
+                const originalText = submitBtn.textContent || submitBtn.value;
+                if (originalText.includes("Publish")) {
+                    submitBtn.textContent = "⏳ Publishing...";
+                } else if (originalText.includes("Save")) {
+                    submitBtn.textContent = "⏳ Saving...";
+                } else if (originalText.includes("Post")) {
+                    submitBtn.textContent = "⏳ Posting...";
+                } else if (originalText.includes("Delete")) {
+                    submitBtn.textContent = "⏳ Deleting...";
+                } else {
+                    submitBtn.textContent = "⏳ Processing...";
+                }
+            }
+        });
+    });
+}
+
+initFormProtection();
+
