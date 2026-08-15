@@ -16,9 +16,9 @@ body {
 }
 
 main {
-    width: 92%;
-    max-width: 1320px;
-    margin: 35px auto;
+    width: 96%;
+    max-width: 1680px;
+    margin: 25px auto;
 }
 
 
@@ -29,7 +29,7 @@ main {
 header.navbar-header {
     background: #141518;
     color: white;
-    padding: 12px 24px;
+    padding: 12px 18px;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -41,8 +41,8 @@ header.navbar-header {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    width: 100%;
-    max-width: 1400px;
+    width: 98%;
+    max-width: 1680px;
     margin: 0 auto;
 }
 
