@@ -126,7 +126,7 @@ header.navbar-header {
 }
 
 .header-search-form input::placeholder {
-    color: #787f8f;
+    color: #8b9cc5;
 }
 
 .header-search-form input:focus {
@@ -1836,28 +1836,14 @@ body:not(.dark-theme) .mobile-drawer-item {
         gap: 6px;
     }
 
+    .header-right > *:not(#theme-toggle) {
+        display: none !important;
+    }
+
     .theme-toggle-btn {
         width: 32px;
         height: 32px;
         font-size: 0.9rem;
-    }
-
-    .create-post-btn-sm {
-        padding: 5px 10px;
-        font-size: 0.78rem;
-    }
-
-    .google-signin-btn-sm span {
-        display: none;
-    }
-
-    .google-signin-btn-sm {
-        padding: 6px;
-        border-radius: 50%;
-    }
-
-    .google-signin-btn-sm svg {
-        margin-right: 0 !important;
     }
 
     .featured-hero-card {
