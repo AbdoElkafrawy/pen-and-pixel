@@ -187,3 +187,49 @@ function initFormProtection() {
 
 initFormProtection();
 
+
+// =======================================================
+//            MOBILE HEADER & DRAWER NAVIGATION
+// =======================================================
+
+function initMobileHeader() {
+    const menuToggleBtn = document.getElementById("mobile-menu-toggle");
+    const menuCloseBtn = document.getElementById("mobile-menu-close");
+    const backdrop = document.getElementById("mobile-menu-backdrop");
+    const drawer = document.getElementById("mobile-nav-drawer");
+    const searchToggleBtn = document.getElementById("mobile-search-toggle");
+    const searchBar = document.getElementById("mobile-search-bar");
+
+    function openDrawer() {
+        if (drawer && backdrop) {
+            drawer.classList.add("active");
+            backdrop.classList.add("active");
+            document.body.style.overflow = "hidden";
+        }
+    }
+
+    function closeDrawer() {
+        if (drawer && backdrop) {
+            drawer.classList.remove("active");
+            backdrop.classList.remove("active");
+            document.body.style.overflow = "";
+        }
+    }
+
+    if (menuToggleBtn) menuToggleBtn.addEventListener("click", openDrawer);
+    if (menuCloseBtn) menuCloseBtn.addEventListener("click", closeDrawer);
+    if (backdrop) backdrop.addEventListener("click", closeDrawer);
+
+    if (searchToggleBtn && searchBar) {
+        searchToggleBtn.addEventListener("click", () => {
+            searchBar.classList.toggle("active");
+            const input = searchBar.querySelector("input");
+            if (input && searchBar.classList.contains("active")) {
+                input.focus();
+            }
+        });
+    }
+}
+
+initMobileHeader();
+

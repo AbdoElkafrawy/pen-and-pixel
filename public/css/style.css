@@ -1439,6 +1439,191 @@ body.dark-theme .author-filter-link:hover {
     color: #60a5fa;
 }
 
+/* Mobile Navigation & Responsive Header Utilities */
+.desktop-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.mobile-only {
+    display: none !important;
+}
+
+.mobile-menu-btn,
+.mobile-icon-btn {
+    background: #22242a;
+    border: 1px solid #2e313a;
+    color: #f7f4ed;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.mobile-menu-btn:hover,
+.mobile-icon-btn:hover {
+    background: #2d3038;
+    border-color: #383b45;
+}
+
+/* Mobile Expandable Search Bar */
+.mobile-search-container {
+    display: none;
+    background: #1a1b1f;
+    padding: 12px 20px;
+    border-bottom: 1px solid #282a31;
+}
+
+.mobile-search-container.active {
+    display: block;
+}
+
+.mobile-search-form {
+    display: flex;
+    gap: 10px;
+}
+
+.mobile-search-form input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #2e3037;
+    background: #141518;
+    color: white;
+    font-size: 0.95rem;
+}
+
+.mobile-search-submit-btn {
+    background: #e2b062;
+    color: #141518;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Mobile Backdrop Overlay */
+.mobile-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+}
+
+.mobile-backdrop.active {
+    display: block;
+}
+
+/* Mobile Navigation Drawer */
+.mobile-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    max-width: 85vw;
+    height: 100vh;
+    background: #1a1b1f;
+    color: #f7f4ed;
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-drawer.active {
+    transform: translateX(0);
+}
+
+.mobile-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #282a31;
+}
+
+.mobile-drawer-close {
+    background: transparent;
+    border: none;
+    color: #949aa7;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.mobile-drawer-links {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 12px;
+}
+
+.mobile-drawer-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 10px;
+    color: #c3c8d4;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.mobile-drawer-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.mobile-highlight-item {
+    background: #e2b062;
+    color: #141518 !important;
+    font-weight: 700;
+}
+
+.mobile-drawer-logout-btn {
+    width: 100%;
+    text-align: left;
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+/* Light Theme Overrides for Mobile Drawer */
+body:not(.dark-theme) .mobile-drawer {
+    background: #ffffff;
+    color: #141518;
+}
+
+body:not(.dark-theme) .mobile-drawer-header {
+    border-color: #e8e6e1;
+}
+
+body:not(.dark-theme) .mobile-drawer-item {
+    color: #334155;
+    background: #f8f7f4;
+}
+
 @media (max-width: 1150px) {
     .posts-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1446,6 +1631,22 @@ body.dark-theme .author-filter-link:hover {
 }
 
 @media (max-width: 768px) {
+    header {
+        padding: 14px 20px;
+    }
+
+    header h1 {
+        font-size: 1.6rem;
+    }
+
+    .desktop-nav-group {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: flex !important;
+    }
+
     .featured-hero-card {
         grid-template-columns: 1fr;
     }
