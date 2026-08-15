@@ -26,119 +26,231 @@ main {
                 2. HEADER & NAVIGATION
    ======================================================= */
 
-header {
+header.navbar-header {
     background: #141518;
     color: white;
-    padding: 18px 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    padding: 12px 24px;
     position: sticky;
     top: 0;
     z-index: 100;
     border-bottom: 1px solid #282a31;
 }
 
-header h1 {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 2.1rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Far Left: Brand Logo & Hamburger Button */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
 }
 
 .brand-logo {
-    color: white;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #f7f4ed;
     text-decoration: none;
+    white-space: nowrap;
     transition: opacity 0.25s ease;
 }
 
 .brand-logo:hover {
-    opacity: 0.85;
+    opacity: 0.88;
 }
 
-.home-nav-link,
-.login-link {
-    color: #9ca3af;
-    text-decoration: none;
-    font-size: 0.95rem;
+.nav-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #22242a;
+    border: 1px solid #2e313a;
+    color: #c3c8d4;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.88rem;
     font-weight: 500;
-    transition: 0.25s ease;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.home-nav-link:hover,
-.login-link:hover {
-    color: white;
+.nav-menu-btn:hover {
+    background: #2d3038;
+    border-color: #383b45;
+    color: #ffffff;
 }
 
-.header-actions {
+/* Middle: Capsule Search Box */
+.header-center {
+    flex: 1;
+    max-width: 480px;
+    margin: 0 8px;
+}
+
+.header-search-form {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 15px;
+    width: 100%;
+}
+
+.search-input-icon {
+    position: absolute;
+    left: 14px;
+    color: #787f8f;
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+
+.header-search-form input {
+    width: 100%;
+    padding: 9px 16px 9px 38px;
+    border-radius: 9999px;
+    border: 1px solid #2e3037;
+    background: #191b20;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.header-search-form input::placeholder {
+    color: #787f8f;
+}
+
+.header-search-form input:focus {
+    border-color: #e2b062;
+    background: #141518;
+    box-shadow: 0 0 0 3px rgba(226, 176, 98, 0.15);
+}
+
+/* Far Right: Actions & Controls */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.header-icon-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #a0a7b5;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.header-icon-link:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .theme-toggle-btn {
-    background: #1f2937;
-    border: 2px solid #374151;
+    background: #22242a;
+    border: 1px solid #2e313a;
     color: white;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 1.1rem;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .theme-toggle-btn:hover {
-    transform: scale(1.1);
-    border-color: #2563eb;
+    transform: scale(1.08);
+    border-color: #e2b062;
 }
 
-.new-post-btn {
+.create-post-btn-sm {
+    background: #e2b062;
+    color: #141518;
     text-decoration: none;
-    background: #2563eb;
-    color: white;
-    padding: 12px 22px;
-    border-radius: 10px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.84rem;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.create-post-btn-sm:hover {
+    background: #eab86d;
+    transform: translateY(-1px);
+}
+
+.google-signin-btn-sm {
+    display: inline-flex;
+    align-items: center;
+    background: #ffffff;
+    color: #3c4043;
+    font-size: 0.82rem;
     font-weight: 600;
-    transition: .25s ease;
-}
-
-.new-post-btn:hover {
-    background: #1d4ed8;
-    transform: translateY(-2px);
-}
-
-.login-link {
-    color: #9ca3af;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid #dadce0;
     text-decoration: none;
-    font-size: 0.9rem;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.google-signin-btn-sm:hover {
+    background: #f8f9fa;
+    border-color: #d2e3fc;
+    color: #174ea6;
+}
+
+.admin-login-link-sm {
+    color: #949aa7;
+    font-size: 0.82rem;
     font-weight: 500;
-    transition: 0.25s ease;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
 }
 
-.login-link:hover {
-    color: white;
+.admin-login-link-sm:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.logout-btn {
+.logout-btn-sm {
     background: #ef4444;
     color: white;
     border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-    transition: 0.25s ease;
+    white-space: nowrap;
+    transition: 0.2s ease;
 }
 
-.logout-btn:hover {
+.logout-btn-sm:hover {
     background: #dc2626;
-    transform: translateY(-2px);
 }
 
 
@@ -1631,20 +1743,68 @@ body:not(.dark-theme) .mobile-drawer-item {
 }
 
 @media (max-width: 768px) {
-    header {
-        padding: 14px 20px;
+    header.navbar-header {
+        padding: 10px 12px;
     }
 
-    header h1 {
-        font-size: 1.6rem;
+    .header-container {
+        gap: 6px;
     }
 
-    .desktop-nav-group {
+    .brand-logo {
+        font-size: 1.2rem;
+    }
+
+    .nav-menu-btn {
+        padding: 5px 10px;
+        font-size: 0.82rem;
+    }
+
+    .menu-text,
+    .nav-label {
         display: none !important;
     }
 
-    .mobile-only {
-        display: flex !important;
+    .header-center {
+        margin: 0 2px;
+    }
+
+    .header-search-form input {
+        padding: 7px 10px 7px 28px;
+        font-size: 0.8rem;
+    }
+
+    .search-input-icon {
+        left: 10px;
+        font-size: 0.78rem;
+    }
+
+    .header-right {
+        gap: 6px;
+    }
+
+    .theme-toggle-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
+    .create-post-btn-sm {
+        padding: 5px 10px;
+        font-size: 0.78rem;
+    }
+
+    .google-signin-btn-sm span {
+        display: none;
+    }
+
+    .google-signin-btn-sm {
+        padding: 6px;
+        border-radius: 50%;
+    }
+
+    .google-signin-btn-sm svg {
+        margin-right: 0 !important;
     }
 
     .featured-hero-card {

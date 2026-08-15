@@ -1,38 +1,47 @@
-<header>
-    <h1><a href="/" class="brand-logo">🖋️ Pen &amp; Pixel</a></h1>
-    
-    <div class="header-actions">
+<header class="navbar-header">
+    <div class="header-container">
+        
+        <!-- Far Left: Logo & Hamburger Menu -->
+        <div class="header-left">
+            <a href="/" class="brand-logo">🖋️ Pen &amp; Pixel</a>
+            
+            <button id="mobile-menu-toggle" class="nav-menu-btn" aria-label="Toggle Menu">
+                <span class="menu-icon">☰</span>
+                <span class="menu-text">Menu</span>
+            </button>
+        </div>
 
-        <!-- Desktop Navigation Links -->
-        <div class="desktop-nav-group">
-            <a href="/" class="home-nav-link">🏠 Home</a>
-
-            <!-- Search Bar -->
-            <form action="/" method="GET" class="search-form">
+        <!-- Middle: Capsule Search Box -->
+        <div class="header-center">
+            <form action="/" method="GET" class="header-search-form">
+                <span class="search-input-icon">🔍</span>
                 <input 
                     type="search" 
                     name="search" 
-                    placeholder="Search posts..."
+                    placeholder="Search articles..."
                     value="<%= typeof search !== 'undefined' && search ? search : '' %>"
-                > 
-            </form> 
-
-            <% if (typeof search !== 'undefined' && search) { %>
-                <a href="/" class="clear-search-btn">Clear Search</a>
-            <% } %>
+                >
+            </form>
         </div>
 
-        <!-- Mobile Search Toggle Button (Visible only on mobile) -->
-        <button id="mobile-search-toggle" class="mobile-icon-btn mobile-only" aria-label="Toggle Search Bar">🔍</button>
+        <!-- Far Right: Home Icon, Theme Toggle, Google Sign In, Admin Login -->
+        <div class="header-right">
+            <!-- Home Icon Link -->
+            <a href="/" class="header-icon-link" title="Home Feed">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </a>
 
-        <!-- Dark / Light Theme Toggle Button -->
-        <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">🌙</button>
+            <!-- Theme Toggle -->
+            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme" title="Toggle theme">🌙</button>
 
-        <!-- Desktop Session & Authentication Controls -->
-        <div class="desktop-nav-group">
+            <!-- User Auth / Sign In Controls -->
             <% if (currentUser) { %>
-                <a href="/my-posts" class="my-posts-link">📚 My Posts</a>
-                <a href="/new" class="new-post-btn">✍️ Create Post</a>
+                <a href="/my-posts" class="header-icon-link" title="My Posts">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-label">My Posts</span>
+                </a>
+                <a href="/new" class="create-post-btn-sm">+ Write</a>
                 <div class="user-profile-badge">
                     <% if (currentUser.avatar) { %>
                         <img src="<%= currentUser.avatar %>" alt="<%= currentUser.displayName %>" class="user-avatar-small">
@@ -42,47 +51,34 @@
                     <span class="user-name-label"><%= currentUser.displayName %></span>
                 </div>
                 <form action="/logout" method="POST" style="margin:0;">
-                    <button type="submit" class="logout-btn">Logout</button>
+                    <button type="submit" class="logout-btn-sm" title="Logout">Logout</button>
                 </form>
             <% } else if (isAdmin) { %>
-                <a href="/my-posts" class="my-posts-link">📚 My Posts</a>
-                <a href="/new" class="new-post-btn">+ New Post</a>
+                <a href="/my-posts" class="header-icon-link" title="My Posts">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-label">My Posts</span>
+                </a>
+                <a href="/new" class="create-post-btn-sm">+ Write</a>
                 <span class="admin-badge">👑 Admin</span>
                 <form action="/logout" method="POST" style="margin:0;">
-                    <button type="submit" class="logout-btn">Logout</button>
+                    <button type="submit" class="logout-btn-sm" title="Logout">Logout</button>
                 </form>
             <% } else { %>
-                <a href="/auth/google" class="google-signin-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle;">
+                <a href="/auth/google" class="google-signin-btn-sm" title="Sign in with Google">
+                    <svg width="15" height="15" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle;">
                         <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
                         <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.11 0-5.74-2.1-6.68-4.93H1.28v3.15C3.25 21.3 7.31 24 12 24z"/>
                         <path fill="#FBBC05" d="M5.32 14.27c-.24-.72-.38-1.49-.38-2.27s.14-1.55.38-2.27V6.58H1.28C.46 8.21 0 10.05 0 12s.46 3.79 1.28 5.42l4.04-3.15z"/>
                         <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.28 6.58l4.04 3.15c.94-2.83 3.57-4.98 6.68-4.98z"/>
                     </svg>
-                    Sign in with Google
+                    <span>Google Sign In</span>
                 </a>
-                <a href="/login" class="login-link">Admin Login</a>
+                <a href="/login" class="admin-login-link-sm">Admin Login</a>
             <% } %>
         </div>
 
-        <!-- Mobile Hamburger Menu Button (Visible only on mobile) -->
-        <button id="mobile-menu-toggle" class="mobile-menu-btn mobile-only" aria-label="Open Navigation Menu">☰</button>
-
     </div>
 </header>
-
-<!-- Mobile Expandable Search Bar -->
-<div id="mobile-search-bar" class="mobile-search-container mobile-only">
-    <form action="/" method="GET" class="mobile-search-form">
-        <input 
-            type="search" 
-            name="search" 
-            placeholder="Search articles..."
-            value="<%= typeof search !== 'undefined' && search ? search : '' %>"
-        > 
-        <button type="submit" class="mobile-search-submit-btn">Search</button>
-    </form>
-</div>
 
 <!-- Mobile Navigation Backdrop Overlay -->
 <div id="mobile-menu-backdrop" class="mobile-backdrop"></div>
