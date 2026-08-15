@@ -5,7 +5,7 @@
 const themeToggleBtn = document.getElementById("theme-toggle");
 
 function getSavedTheme() {
-    return localStorage.getItem("theme") || "light";
+    return localStorage.getItem("theme") || "dark";
 }
 
 function applyTheme(theme) {
