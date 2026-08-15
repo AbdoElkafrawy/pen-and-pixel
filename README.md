@@ -127,5 +127,9 @@ GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
    npm run dev
    ```
 
-5. **Access the Application**:
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. **Application Screenshots**:
+   <img width="1863" height="822" alt="User page" src="https://github.com/user-attachments/assets/adab39ae-32fe-4cc7-81bc-8bf881ec4101" />
+<img width="462" height="788" alt="Menu" src="https://github.com/user-attachments/assets/d8536de4-4f8b-4a32-b866-f2bcd6d0cbf5" />
+<img width="1917" height="870" alt="Home Page" src="https://github.com/user-attachments/assets/88c0fff1-d8af-40be-86d6-6bd77651942f" />
+
+   
