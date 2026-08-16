@@ -9,6 +9,24 @@
 
     <main class="form-container"> 
      
+        <% if (!post.isApproved && isAdmin) { %>
+            <!-- Admin Review Top Banner -->
+            <div class="admin-review-top-banner">
+                <div>
+                    <strong>⏳ Admin Review Mode: Pending Approval</strong>
+                    <p style="margin:2px 0 0 0; font-size:0.88rem; color:#e2b062;">This post is awaiting your approval before public publication.</p>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <form action="/posts/<%= post.id %>/approve" method="POST" style="margin:0;">
+                        <button type="submit" class="approve-btn">✅ Approve &amp; Publish</button>
+                    </form>
+                    <form action="/posts/<%= post.id %>/delete" method="POST" style="margin:0;">
+                        <button type="submit" class="reject-btn" onclick="return confirm('Reject and delete this article?')">🗑️ Reject</button>
+                    </form>
+                </div>
+            </div>
+        <% } %>
+
         <h1><%= post.title %></h1>
 
         <% if (post.image) { %>

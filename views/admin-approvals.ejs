@@ -48,23 +48,21 @@
                                     <span class="status-badge status-pending">⏳ Pending Review</span>
                                     <span class="card-category-tag"><%= post.category || 'General' %></span>
                                 </div>
-                                <h2><a href="/posts/<%= post.id %>" target="_blank"><%= post.title %> ↗</a></h2>
+                                <h2><a href="/posts/<%= post.id %>" target="_blank" title="Preview Full Page"><%= post.title %> ↗</a></h2>
                                 <p class="post-meta">
-                                    ✍️ Author: <strong><%= post.author ? post.author.name : 'User' %></strong> • 📅 <%= post.createdAtDisplay || post.createdAt %>
+                                    ✍️ Author: <strong><%= post.author ? post.author.name : 'User' %></strong> • 📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read
                                 </p>
                             </div>
 
-                            <div class="post-body">
-                                <p>
-                                    <% if (post.content.length > 180) { %>
-                                        <%= post.content.substring(0, 180) %>...
-                                    <% } else { %>
-                                        <%= post.content %>
-                                    <% } %>
-                                </p>
+                            <!-- Full Article Text Reader Box -->
+                            <div class="full-article-reader-box">
+                                <p class="full-article-content"><%= post.content %></p>
                             </div>
 
-                            <div class="admin-approval-actions">
+                            <div class="admin-approval-actions" style="flex-wrap: wrap;">
+                                <a href="/posts/<%= post.id %>" target="_blank" class="preview-full-page-btn" style="flex: 1 1 100%; text-align: center; text-decoration: none; padding: 8px 12px; background: #22242a; color: #e2b062; border: 1px solid #2e313a; border-radius: 8px; font-weight: 600; font-size: 0.86rem; margin-bottom: 6px;">
+                                    👁️ Open Full Article Page ↗
+                                </a>
                                 <form action="/posts/<%= post.id %>/approve" method="POST" style="flex:1;">
                                     <button type="submit" class="approve-btn">✅ Approve &amp; Publish</button>
                                 </form>

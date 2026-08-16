@@ -967,6 +967,14 @@ app.get("/posts/:id", async (req, res) => {
             return res.status(404).send("Post not found");
         }
 
+        // Unapproved posts are only viewable by Admin or the original Author
+        const isAdmin = req.session.isAdmin || (req.user && req.user.role === "admin");
+        const isAuthor = req.user && post.author && post.author.id && (post.author.id.toString() === req.user._id.toString());
+
+        if (!post.isApproved && !isAdmin && !isAuthor) {
+            return res.status(403).send("Forbidden: This article is pending admin approval.");
+        }
+
         const createdAtDate = post.createdAt instanceof Date ? post.createdAt : new Date(post.createdAt);
         const postWithDetails = {
             ...post.toObject(),

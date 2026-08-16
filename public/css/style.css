@@ -2145,3 +2145,39 @@ body.dark-theme .status-pending {
     margin: 0;
 }
 
+
+/* Full Article Reader Box on Approvals Page */
+.full-article-reader-box {
+    background: #191b20;
+    border: 1px solid #2a2d36;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin: 12px 0 16px 0;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.full-article-content {
+    color: #d1d5db;
+    font-size: 0.94rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+}
+
+/* Admin Review Top Banner on Single Post Page */
+.admin-review-top-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: linear-gradient(135deg, #2b2214 0%, #1c160c 100%);
+    border: 1px solid #e2b062;
+    color: #f7f4ed;
+    padding: 14px 20px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 15px rgba(226, 176, 98, 0.15);
+}
+
