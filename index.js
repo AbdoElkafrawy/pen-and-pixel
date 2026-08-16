@@ -1067,7 +1067,23 @@ app.post("/posts/:id/delete", ensureCanEditPost, async (req, res) => {
             deleteImageFile(deletedPost.image);
         }
 
-        res.redirect("/");
+        // Notify user if their pending article was rejected
+        if (!deletedPost.isApproved && deletedPost.author && deletedPost.author.id) {
+            await Notification.create({
+                userId: deletedPost.author.id,
+                message: `❌ Submission Update: Your article "${deletedPost.title}" was reviewed and not approved by the admin.`,
+                type: "rejected",
+                postId: null
+            });
+            console.log(`[Post Rejected] User ${deletedPost.author.name} notified of rejection for "${deletedPost.title}".`);
+        }
+
+        const referer = req.get("Referrer") || "";
+        if (referer.includes("/admin/approvals")) {
+            return res.redirect("/admin/approvals");
+        }
+
+        res.redirect("/my-posts");
 
     } catch (error) {
         console.error("Delete Post Error:", error);
