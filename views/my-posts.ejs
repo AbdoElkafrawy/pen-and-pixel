@@ -9,6 +9,17 @@
 
     <main class="main-container">
         
+        <% if (typeof submitted !== 'undefined' && submitted) { %>
+            <!-- Post Submission Confirmation Banner -->
+            <div class="submission-banner">
+                <span class="banner-icon">⏳</span>
+                <div>
+                    <strong>Article Submitted for Admin Approval!</strong>
+                    <p>Your article has been sent to the admin for review. Once approved, it will be published live on the public feed!</p>
+                </div>
+            </div>
+        <% } %>
+
         <!-- Dashboard Header Banner -->
         <section class="dashboard-header-card">
             <div class="dashboard-user-info">
@@ -21,7 +32,7 @@
                     <h1 class="dashboard-title">📚 My Articles Dashboard</h1>
                     <p class="dashboard-subtitle">
                         Author: <strong><%= currentUser ? currentUser.displayName : 'Admin' %></strong> • 
-                        <span class="count-badge"><%= posts.length %> <%= posts.length === 1 ? 'Article' : 'Articles' %> Published</span>
+                        <span class="count-badge"><%= posts.length %> <%= posts.length === 1 ? 'Article' : 'Articles' %> Total</span>
                     </p>
                 </div>
             </div>
@@ -29,14 +40,60 @@
             <a href="/new" class="create-post-btn-large">✍️ Write New Article</a>
         </section>
 
+        <!-- Admin Pending Approvals Queue -->
+        <% if (isAdmin && typeof pendingPosts !== 'undefined' && pendingPosts.length > 0) { %>
+            <section class="admin-approval-section">
+                <h2 class="admin-approval-heading">
+                    📋 Pending Admin Approvals Queue (<%= pendingPosts.length %> <%= pendingPosts.length === 1 ? 'Article' : 'Articles' %>)
+                </h2>
+                <div class="posts-grid" style="margin-bottom: 35px;">
+                    <% pendingPosts.forEach((post) => { %>
+                        <article class="post-card grid-card pending-approval-card">
+                            <% if (post.image) { %>
+                                <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image grid-image">
+                            <% } %>
+
+                            <div class="post-header">
+                                <span class="status-badge status-pending">⏳ Pending Review</span>
+                                <span class="card-category-tag"><%= post.category || 'General' %></span>
+                                <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
+                                <p class="post-meta">
+                                    ✍️ Author: <strong><%= post.author ? post.author.name : 'User' %></strong> • 📅 <%= post.createdAtDisplay || post.createdAt %>
+                                </p>
+                            </div>
+
+                            <div class="post-body">
+                                <p>
+                                    <% if (post.content.length > 140) { %>
+                                        <%= post.content.substring(0, 140) %>...
+                                    <% } else { %>
+                                        <%= post.content %>
+                                    <% } %>
+                                </p>
+                            </div>
+
+                            <div class="admin-approval-actions">
+                                <form action="/posts/<%= post.id %>/approve" method="POST" style="flex:1;">
+                                    <button type="submit" class="approve-btn">✅ Approve &amp; Publish</button>
+                                </form>
+                                <form action="/posts/<%= post.id %>/delete" method="POST" style="flex:1;">
+                                    <button type="submit" class="reject-btn" onclick="return confirm('Reject and delete this article?')">🗑️ Reject</button>
+                                </form>
+                            </div>
+                        </article>
+                    <% }); %>
+                </div>
+            </section>
+        <% } %>
+
         <!-- User Articles Feed -->
         <section class="posts-magazine">
 
             <% if (posts.length === 0) { %>
                 <div class="empty-dashboard-card">
                     <div class="empty-icon">📝</div>
-                    <h2>No Articles Published Yet</h2>
-                    <p>You haven't published any articles on Pen &amp; Pixel yet. Share your thoughts, technology insights, or story with our readers!</p>
+                    <h2>No Articles Created Yet</h2>
+                    <p>You haven't submitted any articles on Pen &amp; Pixel yet. Share your thoughts, technology insights, or story with our readers!</p>
                     <a href="/new" class="submit-btn" style="display: inline-block; margin-top: 15px; text-decoration: none;">✍️ Publish Your First Article</a>
                 </div>
             <% } else { %>
@@ -48,7 +105,14 @@
                             <% } %>
 
                             <div class="post-header">
-                                <span class="card-category-tag"><%= post.category || 'General' %></span>
+                                <div style="margin-bottom: 8px;">
+                                    <% if (post.isApproved) { %>
+                                        <span class="status-badge status-approved">✅ Published</span>
+                                    <% } else { %>
+                                        <span class="status-badge status-pending">⏳ Pending Approval</span>
+                                    <% } %>
+                                    <span class="card-category-tag"><%= post.category || 'General' %></span>
+                                </div>
                                 <h2><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
                                 <p class="post-meta">
                                     📅 <%= post.createdAtDisplay || post.createdAt %> • ⏱️ <%= post.readingTime %> min read

@@ -146,6 +146,11 @@ const postSchema = new mongoose.Schema({
         default: Date.now
     },
 
+    isApproved: {
+        type: Boolean,
+        default: false
+    },
+
     likes: {
         type: Number,
         default: 0
@@ -279,11 +284,24 @@ async function autoSeedIfEmpty() {
     }
 }
 
-// Run category migration, auto-seeding, and image path cleanup on server startup
+// Approve legacy database posts helper
+async function approveLegacyPosts() {
+    try {
+        await Post.updateMany(
+            { isApproved: { $exists: false } },
+            { $set: { isApproved: true } }
+        );
+    } catch (err) {
+        console.error("Approve legacy posts error:", err);
+    }
+}
+
+// Run category migration, auto-seeding, image path cleanup, and legacy post approval on server startup
 (async () => {
     await autoCategorizePosts();
     await autoSeedIfEmpty();
     await fixImagePaths();
+    await approveLegacyPosts();
 })();
 
 
@@ -536,7 +554,7 @@ app.get("/", async (req, res) => {
         const selectedCategory = req.query.category;
         const selectedAuthor = req.query.author;
 
-        const filter = {};
+        const filter = { isApproved: true };
 
         if (search) {
             filter.$or = [
@@ -755,17 +773,26 @@ app.post("/new", ensureAuthenticated, upload.single("image"), async (req, res) =
             };
         }
 
+        // Admin posts are auto-approved; User posts require admin approval
+        const isApprovedByRole = req.session.isAdmin ? true : false;
+
         const newPost = new Post({
             title,
             content,
             category: category || "General",
             author: authorInfo,
+            isApproved: isApprovedByRole,
             ...(image && { image }),
             createdAt: new Date()
         });
 
         await newPost.save();
-        res.redirect("/my-posts");
+
+        if (isApprovedByRole) {
+            res.redirect("/my-posts");
+        } else {
+            res.redirect("/my-posts?submitted=true");
+        }
 
     } catch (error) {
         console.error("Create Post Error:", error);
@@ -812,7 +839,32 @@ app.get("/my-posts", ensureAuthenticated, async (req, res) => {
             };
         });
 
-        res.render("my-posts", { posts: formattedPosts });
+        // Admin view: fetch all unapproved pending posts across the platform
+        let pendingPosts = [];
+        if (req.session.isAdmin) {
+            const rawPending = await Post.find({ isApproved: false }).sort({ createdAt: -1 });
+            pendingPosts = rawPending.map(post => {
+                const createdAtDate = post.createdAt instanceof Date ? post.createdAt : new Date(post.createdAt);
+                return {
+                    ...post.toObject(),
+                    id: post._id.toString(),
+                    readingTime: calculateReadingTime(post.content),
+                    createdAtDisplay: createdAtDate.toLocaleString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    })
+                };
+            });
+        }
+
+        res.render("my-posts", {
+            posts: formattedPosts,
+            pendingPosts,
+            submitted: req.query.submitted === "true"
+        });
 
     } catch (error) {
         console.error("My Posts Route Error:", error);
@@ -930,6 +982,32 @@ app.post("/posts/:id/delete", ensureCanEditPost, async (req, res) => {
     } catch (error) {
         console.error("Delete Post Error:", error);
         res.status(500).send("Error deleting post");
+    }
+});
+
+
+/* -------------------------------------------------------
+   APPROVE POST ROUTE (Protected: Admin Only)
+   ------------------------------------------------------- */
+
+app.post("/posts/:id/approve", requireAuth, async (req, res) => {
+    try {
+        const approvedPost = await Post.findByIdAndUpdate(
+            req.params.id,
+            { isApproved: true },
+            { new: true }
+        );
+
+        if (!approvedPost) {
+            return res.status(404).send("Post not found");
+        }
+
+        console.log(`[Post Approved] Article "${approvedPost.title}" was approved by Admin.`);
+        res.redirect("/my-posts");
+
+    } catch (error) {
+        console.error("Approve Post Error:", error);
+        res.status(500).send("Error approving post");
     }
 });
 
