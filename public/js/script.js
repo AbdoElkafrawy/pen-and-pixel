@@ -245,3 +245,49 @@ function initMobileHeader() {
 
 initMobileHeader();
 
+
+// =======================================================
+//                NOTIFICATION BELL DROPDOWN
+// =======================================================
+
+function initNotifications() {
+    const bellBtn = document.getElementById("notification-bell-btn");
+    const menu = document.getElementById("notification-menu");
+    const markReadBtn = document.getElementById("mark-notifications-read-btn");
+
+    if (bellBtn && menu) {
+        bellBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            menu.classList.toggle("active");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!menu.contains(e.target) && !bellBtn.contains(e.target)) {
+                menu.classList.remove("active");
+            }
+        });
+    }
+
+    if (markReadBtn) {
+        markReadBtn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            try {
+                const res = await fetch("/notifications/mark-read", { method: "POST" });
+                const data = await res.json();
+                if (data.success) {
+                    const badge = bellBtn ? bellBtn.querySelector(".notification-badge") : null;
+                    if (badge) badge.remove();
+
+                    const unreadItems = document.querySelectorAll(".notification-item.unread");
+                    unreadItems.forEach(item => item.classList.remove("unread"));
+                    markReadBtn.remove();
+                }
+            } catch (err) {
+                console.error("Failed to mark notifications read:", err);
+            }
+        });
+    }
+}
+
+initNotifications();
+

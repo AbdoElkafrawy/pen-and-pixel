@@ -100,6 +100,39 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
+// Defines MongoDB schema for User Notifications
+const notificationSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+    message: {
+        type: String,
+        required: true
+    },
+    type: {
+        type: String,
+        enum: ["submitted", "approved", "rejected", "info"],
+        default: "info"
+    },
+    postId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+        required: false
+    },
+    isRead: {
+        type: Boolean,
+        default: false
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+const Notification = mongoose.model("Notification", notificationSchema);
+
 // Defines the MongoDB schema for blog posts
 const postSchema = new mongoose.Schema({
     title: {
@@ -434,9 +467,50 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Global view variables available in all EJS templates
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
     res.locals.currentUser = req.user || null;
     res.locals.isAdmin = req.session.isAdmin || (req.user && req.user.role === "admin") || false;
+    res.locals.unreadNotificationCount = 0;
+    res.locals.userNotifications = [];
+    res.locals.pendingApprovalCount = 0;
+
+    if (req.user) {
+        try {
+            const rawNotifications = await Notification.find({ userId: req.user._id })
+                .sort({ createdAt: -1 })
+                .limit(10);
+
+            res.locals.userNotifications = rawNotifications.map(n => {
+                const dateObj = n.createdAt instanceof Date ? n.createdAt : new Date(n.createdAt);
+                return {
+                    ...n.toObject(),
+                    id: n._id.toString(),
+                    createdAtDisplay: dateObj.toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    })
+                };
+            });
+
+            res.locals.unreadNotificationCount = await Notification.countDocuments({
+                userId: req.user._id,
+                isRead: false
+            });
+        } catch (e) {
+            console.error("Notifications middleware error:", e);
+        }
+    }
+
+    if (res.locals.isAdmin) {
+        try {
+            res.locals.pendingApprovalCount = await Post.countDocuments({ isApproved: false });
+        } catch (e) {
+            console.error("Pending approvals count error:", e);
+        }
+    }
+
     next();
 });
 
@@ -791,6 +865,14 @@ app.post("/new", ensureAuthenticated, upload.single("image"), async (req, res) =
         if (isApprovedByRole) {
             res.redirect("/my-posts");
         } else {
+            if (req.user) {
+                await Notification.create({
+                    userId: req.user._id,
+                    message: `⏳ Your article "${newPost.title}" has been submitted and is awaiting admin approval.`,
+                    type: "submitted",
+                    postId: newPost._id
+                });
+            }
             res.redirect("/my-posts?submitted=true");
         }
 
@@ -987,6 +1069,38 @@ app.post("/posts/:id/delete", ensureCanEditPost, async (req, res) => {
 
 
 /* -------------------------------------------------------
+   ADMIN PENDING APPROVALS QUEUE ROUTE (Protected: Admin Only)
+   ------------------------------------------------------- */
+
+app.get("/admin/approvals", requireAuth, async (req, res) => {
+    try {
+        const rawPending = await Post.find({ isApproved: false }).sort({ createdAt: -1 });
+        const formattedPending = rawPending.map(post => {
+            const createdAtDate = post.createdAt instanceof Date ? post.createdAt : new Date(post.createdAt);
+            return {
+                ...post.toObject(),
+                id: post._id.toString(),
+                readingTime: calculateReadingTime(post.content),
+                createdAtDisplay: createdAtDate.toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                })
+            };
+        });
+
+        res.render("admin-approvals", { posts: formattedPending });
+
+    } catch (error) {
+        console.error("Admin Approvals Route Error:", error);
+        res.status(500).send("Error loading admin approvals queue.");
+    }
+});
+
+
+/* -------------------------------------------------------
    APPROVE POST ROUTE (Protected: Admin Only)
    ------------------------------------------------------- */
 
@@ -1002,12 +1116,42 @@ app.post("/posts/:id/approve", requireAuth, async (req, res) => {
             return res.status(404).send("Post not found");
         }
 
+        // Notify user that their article has been approved by admin
+        if (approvedPost.author && approvedPost.author.id) {
+            await Notification.create({
+                userId: approvedPost.author.id,
+                message: `🎉 Great news! Your article "${approvedPost.title}" has been approved by the admin and is now live on Pen & Pixel!`,
+                type: "approved",
+                postId: approvedPost._id
+            });
+        }
+
         console.log(`[Post Approved] Article "${approvedPost.title}" was approved by Admin.`);
-        res.redirect("/my-posts");
+        res.redirect("/admin/approvals");
 
     } catch (error) {
         console.error("Approve Post Error:", error);
         res.status(500).send("Error approving post");
+    }
+});
+
+
+/* -------------------------------------------------------
+   NOTIFICATIONS API ROUTE (AJAX)
+   ------------------------------------------------------- */
+
+app.post("/notifications/mark-read", async (req, res) => {
+    try {
+        if (req.user) {
+            await Notification.updateMany(
+                { userId: req.user._id, isRead: false },
+                { $set: { isRead: true } }
+            );
+        }
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Mark notifications read error:", err);
+        res.status(500).json({ error: "Failed to mark notifications read" });
     }
 });
 

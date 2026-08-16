@@ -24,7 +24,7 @@
             </form>
         </div>
 
-        <!-- Far Right: Home Icon, Theme Toggle, Google Sign In, Admin Login -->
+        <!-- Far Right: Home Icon, Notification Bell, Theme Toggle, Google Sign In, Admin Login -->
         <div class="header-right">
             <!-- Home Icon Link -->
             <a href="/" class="header-icon-link" title="Home Feed">
@@ -32,10 +32,43 @@
                 <span class="nav-label">Home</span>
             </a>
 
+            <!-- Notification Bell Icon Dropdown (For Logged in Users) -->
+            <% if (currentUser) { %>
+                <div class="notification-dropdown-container">
+                    <button id="notification-bell-btn" class="notification-bell-btn" aria-label="Notifications" title="Notifications">
+                        🔔
+                        <% if (unreadNotificationCount > 0) { %>
+                            <span class="notification-badge"><%= unreadNotificationCount %></span>
+                        <% } %>
+                    </button>
+
+                    <div id="notification-menu" class="notification-menu">
+                        <div class="notification-menu-header">
+                            <span>🔔 Notifications</span>
+                            <% if (unreadNotificationCount > 0) { %>
+                                <button id="mark-notifications-read-btn" class="mark-read-btn">Mark read</button>
+                            <% } %>
+                        </div>
+                        <div class="notification-menu-list">
+                            <% if (typeof userNotifications === 'undefined' || userNotifications.length === 0) { %>
+                                <p class="no-notifications">No notifications yet</p>
+                            <% } else { %>
+                                <% userNotifications.forEach((n) => { %>
+                                    <div class="notification-item <%= !n.isRead ? 'unread' : '' %>">
+                                        <p class="notification-msg"><%= n.message %></p>
+                                        <span class="notification-time"><%= n.createdAtDisplay %></span>
+                                    </div>
+                                <% }); %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+
             <!-- Theme Toggle -->
             <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme" title="Toggle theme">🌙</button>
 
-            <!-- User Auth / Sign In Controls -->
+            <!-- User Auth / Sign In / Admin Controls -->
             <% if (currentUser) { %>
                 <a href="/my-posts" class="header-icon-link" title="My Posts">
                     <span class="nav-icon">📚</span>
@@ -54,6 +87,12 @@
                     <button type="submit" class="logout-btn-sm" title="Logout">Logout</button>
                 </form>
             <% } else if (isAdmin) { %>
+                <a href="/admin/approvals" class="header-icon-link pending-approvals-nav-btn" title="Pending Approvals">
+                    <span>📋 Approvals</span>
+                    <% if (pendingApprovalCount > 0) { %>
+                        <span class="count-badge" style="background:#e2b062; color:#141518; margin-left:4px;"><%= pendingApprovalCount %></span>
+                    <% } %>
+                </a>
                 <a href="/my-posts" class="header-icon-link" title="My Posts">
                     <span class="nav-icon">📚</span>
                     <span class="nav-label">My Posts</span>
@@ -104,11 +143,21 @@
     </div>
 
     <nav class="mobile-drawer-links">
+        <% if (isAdmin) { %>
+            <!-- Admin Pending Approvals (First for Admin!) -->
+            <a href="/admin/approvals" class="mobile-drawer-item mobile-highlight-item">
+                <span>📋 Pending Approvals</span>
+                <% if (pendingApprovalCount > 0) { %>
+                    <span class="count-badge" style="background:#141518; color:#e2b062; margin-left:auto;"><%= pendingApprovalCount %></span>
+                <% } %>
+            </a>
+        <% } %>
+
         <% if (!currentUser && !isAdmin) { %>
-            <!-- 1. Admin Login (First!) -->
+            <!-- 1. Admin Login (First for Guest!) -->
             <a href="/login" class="mobile-drawer-item">🔑 Admin Login</a>
 
-            <!-- 2. Sign in with Google (Second!) -->
+            <!-- 2. Sign in with Google (Second for Guest!) -->
             <a href="/auth/google" class="mobile-drawer-item mobile-highlight-item">
                 <svg width="16" height="16" viewBox="0 0 24 24" style="margin-right: 8px; vertical-align: middle;">
                     <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
@@ -120,10 +169,10 @@
             </a>
         <% } %>
 
-        <!-- 3. Home Feed (Third!) -->
+        <!-- Home Feed -->
         <a href="/" class="mobile-drawer-item">🏠 Home Feed</a>
 
-        <!-- 4. Categories Accordion Sub-menu (Fourth!) -->
+        <!-- Categories Accordion Sub-menu -->
         <div class="mobile-drawer-submenu-group">
             <button id="category-submenu-toggle" class="mobile-drawer-item category-submenu-btn" aria-expanded="false">
                 <span>🏷️ Categories</span>

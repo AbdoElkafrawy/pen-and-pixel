@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("partials/head", { title: "📋 Admin Pending Approvals — Pen & Pixel" }) %>
+</head>
+<body>
+
+    <%- include("partials/header") %>
+
+    <main class="main-container">
+        
+        <!-- Dashboard Header Banner -->
+        <section class="dashboard-header-card" style="background: linear-gradient(135deg, #2b2214 0%, #1c160c 100%); border: 1px solid rgba(226, 176, 98, 0.3);">
+            <div class="dashboard-user-info">
+                <div class="dashboard-avatar-placeholder" style="background: #3d301b; color: #e2b062;">📋</div>
+                <div>
+                    <h1 class="dashboard-title" style="color: #f7f4ed;">Pending Approvals Queue</h1>
+                    <p class="dashboard-subtitle" style="color: #c5ba9d;">
+                        Review user-submitted articles • 
+                        <span class="count-badge" style="background: #e2b062; color: #141518;"><%= posts.length %> <%= posts.length === 1 ? 'Article' : 'Articles' %> Awaiting Review</span>
+                    </p>
+                </div>
+            </div>
+
+            <a href="/my-posts" class="create-post-btn-large" style="background: #22242a; color: #f7f4ed; border: 1px solid #2e313a;">📚 My Articles</a>
+        </section>
+
+        <!-- Pending Approvals Feed -->
+        <section class="posts-magazine">
+
+            <% if (posts.length === 0) { %>
+                <div class="empty-dashboard-card" style="border-color: #2e3037;">
+                    <div class="empty-icon">🎉</div>
+                    <h2>All Caught Up!</h2>
+                    <p>There are currently no user-submitted articles waiting for approval. New user submissions will appear here automatically.</p>
+                    <a href="/" class="submit-btn" style="display: inline-block; margin-top: 15px; text-decoration: none;">🏠 Return to Home Feed</a>
+                </div>
+            <% } else { %>
+                <div class="posts-grid">
+                    <% posts.forEach((post) => { %>
+                        <article class="post-card grid-card pending-approval-card">
+                            <% if (post.image) { %>
+                                <img src="<%= post.image %>" alt="<%= post.title %>" class="post-image grid-image">
+                            <% } %>
+
+                            <div class="post-header">
+                                <div style="margin-bottom: 8px;">
+                                    <span class="status-badge status-pending">⏳ Pending Review</span>
+                                    <span class="card-category-tag"><%= post.category || 'General' %></span>
+                                </div>
+                                <h2><a href="/posts/<%= post.id %>" target="_blank"><%= post.title %> ↗</a></h2>
+                                <p class="post-meta">
+                                    ✍️ Author: <strong><%= post.author ? post.author.name : 'User' %></strong> • 📅 <%= post.createdAtDisplay || post.createdAt %>
+                                </p>
+                            </div>
+
+                            <div class="post-body">
+                                <p>
+                                    <% if (post.content.length > 180) { %>
+                                        <%= post.content.substring(0, 180) %>...
+                                    <% } else { %>
+                                        <%= post.content %>
+                                    <% } %>
+                                </p>
+                            </div>
+
+                            <div class="admin-approval-actions">
+                                <form action="/posts/<%= post.id %>/approve" method="POST" style="flex:1;">
+                                    <button type="submit" class="approve-btn">✅ Approve &amp; Publish</button>
+                                </form>
+                                <form action="/posts/<%= post.id %>/delete" method="POST" style="flex:1;">
+                                    <button type="submit" class="reject-btn" onclick="return confirm('Reject and delete this article?')">🗑️ Reject</button>
+                                </form>
+                            </div>
+                        </article>
+                    <% }); %>
+                </div>
+            <% } %>
+
+        </section>
+
+    </main>
+
+    <%- include("partials/footer") %>
+
+</body>
+</html>
