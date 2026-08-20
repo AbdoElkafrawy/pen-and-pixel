@@ -9,44 +9,45 @@
 
     <main>
         <!-- =======================================================
-             HERO BANNER & WIDGETS SECTION WITH BACKGROUND
+                            HERO BANNER
         ======================================================= -->
-        <section class="hero-widgets-container">
-            <div class="hero">
-                <div class="hero-card-box">
-                    <span class="hero-badge">✨ Welcome to Pen &amp; Pixel</span>
-                    <h2>Every great creation begins with a single thought.</h2>
-                    <p>Write yours.</p>
+        <section class="hero">
+            <div class="hero-card-box">
+                <span class="hero-badge">✨ Welcome to Pen &amp; Pixel</span>
+                <h2>Every great creation begins with a single thought.</h2>
+                <p>Write yours.</p>
 
-                    <% if (isAdmin) { %>
-                        <a href="/new" class="hero-btn">Start Writing</a>
-                    <% } %>
+                <% if (isAdmin) { %>
+                    <a href="/new" class="hero-btn">Start Writing</a>
+                <% } %>
+            </div>
+        </section>
+
+
+        <!-- =======================================================
+                 SIDE-BY-SIDE WIDGETS (Weather & Quote)
+        ======================================================= -->
+        <section class="widgets-bar">
+            <% if (weather) { %>
+                <div class="weather-card">
+                    <h3>📍 <%= weather.city %></h3>
+                    <div class="weather-temp">
+                        <%= Math.round(weather.temperature) %>°C
+                    </div>
+                    <p class="weather-desc"><%= weather.description %></p>
+                    <p class="weather-feels">
+                        Feels like <strong><%= Math.round(weather.feelsLike) %>°C</strong>
+                    </p>
                 </div>
-            </div>
+            <% } %>
 
-            <!-- SIDE-BY-SIDE WIDGETS (Weather & Quote) -->
-            <div class="widgets-bar">
-                <% if (weather) { %>
-                    <div class="weather-card">
-                        <h3>📍 <%= weather.city %></h3>
-                        <div class="weather-temp">
-                            <%= Math.round(weather.temperature) %>°C
-                        </div>
-                        <p class="weather-desc"><%= weather.description %></p>
-                        <p class="weather-feels">
-                            Feels like <strong><%= Math.round(weather.feelsLike) %>°C</strong>
-                        </p>
-                    </div>
-                <% } %>
-
-                <% if (quote) { %>
-                    <div class="quote-card">
-                        <h3>💬 Quote of the Day</h3>
-                        <blockquote>"<%= quote.text %>"</blockquote>
-                        <p class="quote-author">— <%= quote.author %></p>
-                    </div>
-                <% } %>
-            </div>
+            <% if (quote) { %>
+                <div class="quote-card">
+                    <h3>💬 Quote of the Day</h3>
+                    <blockquote>"<%= quote.text %>"</blockquote>
+                    <p class="quote-author">— <%= quote.author %></p>
+                </div>
+            <% } %>
         </section>
 
 
