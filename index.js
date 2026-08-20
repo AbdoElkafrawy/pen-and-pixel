@@ -620,6 +620,55 @@ async function fetchWeatherForClient(clientIp) {
 // =======================================================
 
 /* -------------------------------------------------------
+   SEARCH ENGINE OPTIMIZATION (SEO & SITEMAP ROUTES)
+   ------------------------------------------------------- */
+
+app.get("/robots.txt", (req, res) => {
+    const baseUrl = process.env.BASE_URL || "https://pen-and-pixel.onrender.com";
+    res.type("text/plain");
+    res.send(
+        `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /my-posts\nDisallow: /new\nDisallow: /login\n\nSitemap: ${baseUrl}/sitemap.xml`
+    );
+});
+
+app.get("/sitemap.xml", async (req, res) => {
+    try {
+        const posts = await Post.find({ isApproved: true }).sort({ createdAt: -1 });
+        const baseUrl = process.env.BASE_URL || "https://pen-and-pixel.onrender.com";
+
+        let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+        xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+        xml += `  <url>\n`;
+        xml += `    <loc>${baseUrl}/</loc>\n`;
+        xml += `    <changefreq>daily</changefreq>\n`;
+        xml += `    <priority>1.0</priority>\n`;
+        xml += `  </url>\n`;
+
+        posts.forEach(post => {
+            const dateObj = post.createdAt instanceof Date ? post.createdAt : new Date(post.createdAt);
+            const dateStr = !isNaN(dateObj.getTime()) ? dateObj.toISOString() : new Date().toISOString();
+
+            xml += `  <url>\n`;
+            xml += `    <loc>${baseUrl}/posts/${post._id}</loc>\n`;
+            xml += `    <lastmod>${dateStr}</lastmod>\n`;
+            xml += `    <changefreq>weekly</changefreq>\n`;
+            xml += `    <priority>0.8</priority>\n`;
+            xml += `  </url>\n`;
+        });
+
+        xml += `</urlset>`;
+
+        res.header("Content-Type", "application/xml");
+        res.send(xml);
+    } catch (e) {
+        console.error("Sitemap generation error:", e);
+        res.status(500).end();
+    }
+});
+
+
+/* -------------------------------------------------------
    HOME FEED & SEARCH ROUTE
    ------------------------------------------------------- */
 app.get("/", async (req, res) => {
